@@ -1,0 +1,457 @@
+<!--
+Author: Andy Ching
+Email: dogdoglization@gmail.com
+License: MIT
+-->
+
+<!DOCTYPE html>
+<html manifest="index.appcache" ng-app ng-controller="globalControl">
+    <head>
+        <title>JSSO Server</title>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+		<script src="js/jquery-2.0.3.min.js"></script>
+		<link href="css/codemirror.css" rel="stylesheet">
+		<link href="css/codemirror-theme/3024-day.css" rel="stylesheet">
+		<link href="css/codemirror-theme/3024-night.css" rel="stylesheet">
+		<link href="css/codemirror-theme/ambiance.css" rel="stylesheet">
+		<link href="css/codemirror-theme/ambiance-mobile.css" rel="stylesheet">
+		<link href="css/codemirror-theme/base16-dark.css" rel="stylesheet">
+		<link href="css/codemirror-theme/base16-light.css" rel="stylesheet">
+		<link href="css/codemirror-theme/blackboard.css" rel="stylesheet">
+		<link href="css/codemirror-theme/cobalt.css" rel="stylesheet">
+		<link href="css/codemirror-theme/eclipse.css" rel="stylesheet">
+		<link href="css/codemirror-theme/elegant.css" rel="stylesheet">
+		<link href="css/codemirror-theme/erlang-dark.css" rel="stylesheet">
+		<link href="css/codemirror-theme/lesser-dark.css" rel="stylesheet">
+		<link href="css/codemirror-theme/midnight.css" rel="stylesheet">
+		<link href="css/codemirror-theme/monokai.css" rel="stylesheet">
+		<link href="css/codemirror-theme/neat.css" rel="stylesheet">
+		<link href="css/codemirror-theme/night.css" rel="stylesheet">
+		<link href="css/codemirror-theme/paraiso-dark.css" rel="stylesheet">
+		<link href="css/codemirror-theme/paraiso-light.css" rel="stylesheet">
+		<link href="css/codemirror-theme/rubyblue.css" rel="stylesheet">
+		<link href="css/codemirror-theme/solarized.css" rel="stylesheet">
+		<link href="css/codemirror-theme/the-matrix.css" rel="stylesheet">
+		<link href="css/codemirror-theme/tomorrow-night-eighties.css" rel="stylesheet">
+		<link href="css/codemirror-theme/twilight.css" rel="stylesheet">
+		<link href="css/codemirror-theme/vibrant-ink.css" rel="stylesheet">
+		<link href="css/codemirror-theme/xq-dark.css" rel="stylesheet">
+		<link href="css/codemirror-theme/xq-light.css" rel="stylesheet">
+		<script src="js/codemirror.js"></script>
+		<script src="js/codemirror-mode/javascript.js"></script>
+		<link href="css/bootstrap.min.css" rel="stylesheet">
+		<link href="css/bootstrap-theme.min.css" rel="stylesheet">
+		<link href="css/bootstrap-custom.css" rel="stylesheet">
+		<script src="js/bootstrap.min.js"></script>
+		<link rel="stylesheet" type="text/css" href="css/index.css"/>
+		<!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
+		<!--[if lt IE 9]>
+		  <script src="js/html5shiv.js"></script>
+		  <script src="js/respond.min.js"></script>
+		<![endif]-->
+		<script src="js/angular.min.js"></script>
+		<script src="cloud.js">
+			Cloud.setting.server.host =  "192.168.0.3";
+		</script>
+    </head>
+    <body>
+		<div id="view">
+			<header id="header" class="row">
+				<div class="col-xs-2 col-sm-4 col-lg-3">
+					<button id="jssoIdListBtn" type="button" class="btn btn-primary pull-left" onclick="
+						$('#leftBox').css('display')==='none'? toMenu() : toEditor()
+					">
+						<span class="glyphicon glyphicon-align-justify"></span>
+					</button>
+					
+				</div>
+				<div class="col-xs-8 col-sm-7 col-lg-8">
+					<span id="editor_title"><span ng-class="{modified: activeItem.modified}">{{activeItem.name}}<span ng-show="activeItem.modified"> *</span></span></span>
+					
+				</div>
+				<div class="col-xs-2 col-sm-1">
+					<button id="editor_saveBtn" type="button" title="save code to server" class="btn btn-primary pull-right" ng-click="saveJssoContent(activeItem)" ng-disabled="!(activeItem && activeItem.modified)">
+						<span class="glyphicon glyphicon-saved"></span>
+						<span name="text">Save</span>
+					</button>
+				</div>
+			</header>
+			<div id="body" class="row">
+				<aside id="leftBox" class="col-sm-4 col-lg-3">
+					<div id="jssoIdListQueryBar" class="input-group">
+						<input id="list_searchBar" type="text" class="form-control" placeholder="search / add" ng-model="query"/>
+						<span class="input-group-btn">
+							<button type="button" title="add new jsso with this ID"  class="btn btn-primary" ng-click="addNewJssoId(query)" ng-disabled="!isJssoIdListEmpty">
+								<span class="glyphicon glyphicon-search" ng-hide="isJssoIdListEmpty"></span>
+								<span class="glyphicon glyphicon-plus" ng-show="isJssoIdListEmpty"></span>
+							</button>
+						</span>
+					</div>
+					<div id="jssoIdListLoadingBlock" class="jumbotron" ng-show="jssoIdListLoadingBlock.show">
+						<span class="glyphicon glyphicon-refresh loading"></span> <b>Loading...</b>
+					</div>
+					<div id="jssoIdListNoItemInstructor" class="well well-sm" ng-show="!(jssoIdListLoadingBlock.show||jssoIdListData.length>0)">
+						<span>No items</span>
+					</div>
+					<div id="jssoIdList" class="list-group" ng-show="jssoIdListData.length>0">
+						<a class="list-group-item" jssoId="{{jssoIdListItem.id}}" ng-repeat="jssoIdListItem in (filteredListItem = (jssoIdListData | filter:query)) | orderBy:'name'" ng-class="jssoIdListItem.active">
+							<div class="btn-group">
+								<button type="button" class="btn btn-black listItemText" ng-click="readJssoContent(jssoIdListItem)">
+									<span ng-class="{modified: jssoIdListItem.modified}">{{jssoIdListItem.name}}<span ng-show="jssoIdListItem.modified"> *</span></span>
+								</button>
+								<span class="listItemIndicator">
+								<span class="glyphicon glyphicon-refresh loading pull-right" ng-show="jssoIdListItem.loading"></span>
+								<button type="button" title="delete this jsso on server" class="btn btn-black pull-right" data-toggle="modal" data-target="#deleteItemDialog" ng-click="setDeleteTarget(jssoIdListItem.id)" ng-hide="jssoIdListItem.loading">
+									<span class="glyphicon glyphicon-remove"></span>
+								</button>
+								</span>
+							</div>
+						</a>
+					</div>
+				</aside>
+				<div id="centralBox" class="col-sm-8 col-lg-9">
+					<div id="editor" style="padding: 0px;"></div>
+				</div>
+			</div>
+			<footer id="footer" class="row">
+				<div class="col-xs-2 col-sm-2 col-lg-2">
+					<button id="tabBtn" type="button" class="btn btn-darkpurple pull-left">
+						<span class="glyphicon glyphicon-transfer"></span>
+						Tab
+					</button>
+				</div>
+				<div class="col-xs-8 col-sm-8 col-lg-8">
+					<div id="alert" class="alert" onclick="$(this).fadeOut('fast').hide();">
+						<span></span>
+					</div>
+				</div>
+				<div class="col-xs-2 col-sm-2">
+					<div class="btn-group dropup pull-right">
+						<button id="styleListBtn" type="button" title="change style" class="btn btn-default dropdown-toggle" data-toggle="dropdown">
+							<span class="glyphicon glyphicon-eye-open"></span>
+							{{currentStyle}}
+						</button>
+						<ul id="styleList" class="dropdown-menu pull-right">
+							<li ng-repeat="style in styleList">
+								<a ng-click="changeStyle(style)">{{style}}</a>
+							</li>
+						</ul>
+					</div>
+				</div>
+			</footer>
+		</div>
+		<div class="modal fade" id="deleteItemDialog" tabindex="-1" role="dialog" aria-labelledby="delDialogLabel" aria-hidden="true">
+			<div class="modal-dialog">
+				<div class="modal-content">
+					<div class="modal-header">
+						Delete <b>{{deleteDialog_target}}</b>
+					</div>
+					<div class="modal-body">
+						The data will be removed from database and you cannot undo this, <b>Are you sure?</b>
+					</div>
+					<div class="modal-footer">
+						<button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+						<button type="button" class="btn btn-danger" data-dismiss="modal" ng-click="removeItem(deleteDialog_target)">Delete</button>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<script>
+			var db = new Cloud("admin.db");
+			var codeEditor = CodeMirror($("#editor").get(0), {
+				mode: {
+					name: "javascript",
+					json: true
+				},
+				indentWithTabs: true,
+				lineNumbers: true,
+				tabSize: 2
+			});
+		</script>
+		<script>
+			/* Alert */
+			(function(global) {
+				var alert = function(msg, type) {
+					var alert = $("#alert");
+					if (alert.css("display") !== "none")
+						alert.hide(); //if alert showing
+					$("#alert > span").text(msg); //set message
+					alert.removeClass("alert-success alert-info alert-warning alert-danger").addClass("alert-" + type);
+					alert.fadeIn("slow").show(function() {
+						setTimeout(function() {
+							alert.fadeOut("slow", function() {
+								alert.hide();
+							});
+						}, 5000);
+					});
+				};
+				global.alertSuccess = function(msg) {
+					if (typeof msg !== "string")
+						msg = msg.toString();
+					alert(msg, "success");
+				};
+				global.alertError = function(msg) {
+					if (typeof msg !== "string")
+						msg = msg.toString();
+					alert(msg, "danger");
+				};
+			})(this);
+			var cleanEditor = function() {
+				codeEditor.setValue("");
+			};
+			var toMenu = function() {
+				if (window.innerWidth < 768) {
+					$("#leftBox").slideDown("fast", "linear");
+					$("#centralBox").slideUp("fast", "linear");
+				}
+			};
+			var toEditor = function() {
+				if (window.innerWidth < 768) {
+					$("#centralBox").slideDown("fast", "linear");
+					$("#leftBox").slideUp("fast", "linear");
+				}
+				codeEditor.focus();
+			};
+			//tab btn function
+			$("#tabBtn").on("click", function() {
+				event.preventDefault();
+				codeEditor.focus();
+				codeEditor.replaceRange("\t", codeEditor.getCursor());
+			});
+			//temp-storage of contents in editing
+			var  editingContent = {};
+		</script>
+		<script>
+			function globalControl($scope) {
+				/* JSSO Id List */
+				//initial list state
+				$scope.jssoIdListData = new Array(); //contain all jsso ids
+				$scope.isJssoIdListEmpty = false;
+				var changeListState = function() {
+					setTimeout(function() { //after filter the list items
+						$scope.$apply(function($scope) { //change the state
+							$scope.isJssoIdListEmpty = ($scope.filteredListItem !== undefined) && ($scope.filteredListItem.length == 0); 
+						});
+					}, 0);
+				};
+				$scope.$watch("query", changeListState); //each time when new querying
+				//function to load|reload the list items
+				$scope.loadJssoList = function() {
+					$scope.jssoIdListLoadingBlock = {show: true};
+					db.invoke("getIdList", function(idList) {
+						var listData = new Array(), i;
+						for (i in idList)
+							listData.push({
+								"name": idList[i],
+								"id": idList[i]
+							});
+						//call to let angularJS know the change of model
+						$scope.$apply(function($scope) {
+							//change the model
+							$scope.jssoIdListData = listData;
+							//disable loading instruction
+							$scope.jssoIdListLoadingBlock.show = false;
+							changeListState(); //each time when new load the list from server
+						});
+					}, function(error) {
+						alertError("Fail to retrieve jsso ID list.");
+						//disable loading instruction
+						$scope.$apply(function($scope) {
+							$scope.jssoIdListLoadingBlock.show = false;
+						});
+					});
+				};
+				//load when start
+				$scope.loadJssoList();
+				
+				// interactions
+				$scope.activeItem = null;
+				// get jsso content and show on editor
+				$scope.readJssoContent = function(listItem) {
+					listItem.loading = true;
+					//cache the unsaved content for replacement in future
+					if ($scope.activeItem)
+						editingContent[$scope.activeItem.id] = codeEditor.getValue();
+					//avoid active_item-content inconsistent
+					cleanEditor();
+					$scope.activeItem = null;
+					var laterProcess = function(textToSet) {
+						//set editor centent
+						codeEditor.setValue(textToSet);
+						//point selected item
+						$scope.activeItem = listItem;
+						for (var i in $scope.jssoIdListData)
+							$scope.jssoIdListData[i].active = "";
+						listItem.active = "active";
+						listItem.loading = false; //remove loading instructor
+						toEditor(); //move to editor
+					};
+					if (editingContent[listItem.id]) {
+						laterProcess(editingContent[listItem.id]);
+					}
+					else
+						db.invoke("getText", listItem.id, function(data) {
+							$scope.$apply(function($scope) {
+								laterProcess(data)
+							});
+						}, function(err) {
+							$scope.$apply(function($scope) {
+								listItem.loading = false;
+								alertError(err);
+							});
+						});
+				};
+				// save jsso content from editor to DB
+				$scope.saveJssoContent = function(listItem) {
+					var code = codeEditor.getValue();
+					//perform local-checking first
+					try {
+						if (typeof eval("(function(){return " + code + ";}).call(null)") !== "object")
+							throw new Error("It is not an object!");
+					} catch (err) {
+						alertError(err.message);
+						var line;
+						if (line = (err.lineNumber || err.line)) {//firefox|IE only, not Chrome
+							line -= 302; //the line of eval()
+							codeEditor.addLineClass(line, "text", "editor-error-line-text-highlight");
+							codeEditor.addLineClass(line, "background", "editor-error-line-background-highlight");
+							var cleanHight = function() {
+								codeEditor.removeLineClass(line, "text");
+								codeEditor.removeLineClass(line, "background");
+								codeEditor.off("change", cleanHight);
+							};
+							codeEditor.on("change", cleanHight);
+						}
+						return;
+					}
+					//save to server
+					db.invoke("save", [listItem.id, code], function() {
+						$scope.$apply(function() {
+							listItem.modified = false;
+						});
+						alertSuccess("Saved.");
+					}, function(err) {
+						alertError("Error on saving: " + err);
+					});
+				};
+				//
+				//change state when content changed
+				codeEditor.on("change", function() {
+					if ($scope.activeItem) {
+						$scope.$apply(function() {
+							$scope.activeItem.modified = true;
+						});
+					}
+				});
+				//bind save function to ctrl+s in editor
+				codeEditor.addKeyMap({
+					"Ctrl-S": function(cm) {
+						$scope.$apply(function($scope) {
+							if ($scope.activeItem !== null)
+								$scope.saveJssoContent($scope.activeItem);
+						});
+					}
+				}, true);
+				//
+				//add new jsso
+				$scope.addNewJssoId = function(jssoId) {
+					$scope.query = ""; //clear query field
+					listItem = {
+						"name": jssoId,
+						"id": jssoId
+					};
+					$scope.jssoIdListData.push(listItem); //add item to list
+					//save to server and then read from it
+					setTimeout(function() {
+						$scope.$apply(function($scope) {
+							listItem.loading = true;
+						});
+						db.invoke("save", [jssoId, "{\n\tid: \"" + jssoId + "\"\n}"], function() {
+							alertSuccess("Added to server.");
+							$scope.$apply(function($scope) {
+								listItem.loading = false;
+								$scope.readJssoContent(listItem);
+							});
+						}, function(err) {
+							console.log(err);
+							alertError("Error on saving!");
+							$scope.$apply(function($scope) {
+								listItem.loading = false;
+							});
+						});
+					},0);
+					
+				};
+				$scope.removeItem = function(jssoId) {
+					//remove from server DB
+					db.invoke("remove", jssoId, function() {
+						//remove the list item
+						$scope.$apply(function($scope) {
+							for (var i in $scope.jssoIdListData)
+								if ($scope.jssoIdListData[i].id === jssoId) {
+									$scope.jssoIdListData.splice(i, 1);
+									break;
+								}
+							setTimeout(function() {//call after DOM render
+								//clean the content of editor if it represent the removed item
+								if ($("#jssoIdList > li.active").size() === 0)
+									cleanEditor();
+							}, 0);
+						});
+						
+					}, function(err) {
+						alertError("Fail to remove <" + jssoId + ">: " + err);
+					});
+				};
+				//delete dialog for removeItem
+				$scope.deleteDialog_target; //jssoId of item to remove
+				$scope.setDeleteTarget = function(jssoId) {//pass jssoId from list item to dialog
+					$scope.deleteDialog_target = jssoId;
+				};
+				//end of interactions
+				/* end of Jsso Id List */
+				
+				/* Editor */
+				/* set Style */
+				$scope.styleList = [
+					"default",
+					"3024-day",
+					"3024-night",
+					"ambiance",
+					"ambiance-mobile",
+					"base16-dark",
+					"base16-light",
+					"blackboard",
+					"cobalt",
+					"eclipse",
+					"elegant",
+					"erlang-dark",
+					"lesser-dark",
+					"midnight",
+					"monokai",
+					"neat",
+					"night",
+					"paraiso-dark",
+					"paraiso-light",
+					"rubyblue",
+					"solarized",
+					"the-matrix",
+					"tomorrow-night-eighties",
+					"twilight",
+					"vibrant-ink",
+					"xq-dark",
+					"xq-light"
+				];
+				$scope.changeStyle = function(style) {
+					codeEditor.setOption("theme", style);
+					$scope.currentStyle = style;
+				};
+				//set default style
+				$scope.changeStyle("ambiance");
+				/* end of Editor Style */
+			}
+		</script>
+    </body>
+</html>
