@@ -34,6 +34,35 @@ service.invoke("functionName", //the function name of the JSSO, required
 		...
 	});
 ```
+You may also broadcast messages, as well as listen on them:
+```JavaScript
+var service = new Cloud("your JSSO ID");
+service.on("messageName", function onReceived(message) { //listen messages of specified message name from JSSO
+	... //handle message
+});
+service.broadcast("messageName", "message"); //broadcast a message with given message name
+service.off("messageName") //unregister the handler of specified message name
+```
+You may wonder why the message name is required, it is because you can write a message handler at server like this:
+```JavaScript
+/*server side */
+{//your JSSO
+	functionName: function(theMessageToBroadcast) {//the broadcast handler, same as other functions
+		... //handle this message, do whatever you want
+		return messageToAllListeners; //return message that the listeners will received
+	}
+}
+
+/* client side */
+var service = new Cloud("the JSSO ID");
+service.on("functionName", function onReceived(message) { //listen messages of specified message name from JSSO
+	... //handle message
+});
+service.broadcast("functionName", "message"); //broadcast a message with given message name
+service.off("functionName") //unregister the handler of specified message name
+```
+and yes, you right, it's just a function call.
+
 
 to be continue...
 
@@ -52,6 +81,19 @@ You are required to install the following node.js modules in order to start the 
 2. install all the required modules (see the perious section)
 3. download the source code of this repository by clicking the "Download ZIP" button at the right of the page
 ![alt text](https://raw.github.com/dogdoglization/node-jsso-server/master/readme_resource/how_to_download.png "How to download GitHub repository")
+4. extract the zip file, there should be an "index.js" file in the root folder
+5. open the system console, change to the root directory, and then start the server by entering "node index.js", like this:
+```DOS batch files
+C:\Users\YourAccount>cd The\Directory\Of\The\Folder\You\Extract\From\The\ZIP\File
+
+The\Directory\Of\The\Folder\You\Extract\From\The\ZIP\File> node index.js
+
+```
+6. now a JSSO server is listen on port 8080, and a http server is listen on port 80
+> you can change the listening port by modify the code in index.js if any problems about the use of port number on your computer
+7. open a web browser and go to http://localhost/, it is the place for you to control all JSSOs which are found in database.
+> do remember that **Do Not Make Any Change Of "admin.db" JSSO** because you need it to access the database, else this web page will be functionless and you will probably get into trouble
+
 ## Licence
 The MIT Licence (MIT) [http://opensource.org/licenses/mit-license.php](http://opensource.org/licenses/mit-license.php)
 
