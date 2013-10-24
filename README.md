@@ -51,7 +51,7 @@ You are required to install the following node.js modules in order to start the 
 1. install the last version of [node.js](http://nodejs.org/)
 2. install all the required modules (see the perious section)
 3. download the source code of this repository by clicking the "Download ZIP" button at the right of the page
-
+![alt text](https://raw.github.com/dogdoglization/node-jsso-server/master/readme_resource/how_to_download.png "How to download GitHub repository")
 ## Licence
 The MIT Licence (MIT) [http://opensource.org/licenses/mit-license.php](http://opensource.org/licenses/mit-license.php)
 
