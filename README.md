@@ -41,19 +41,21 @@ to be continue...
 
 
 ## Dependencies
-You are required to install the following modules in order to run the server.
+You are required to install the following node.js modules in order to start the server:
 + [express](https://github.com/visionmedia/express)
 + [node-uuid](https://github.com/broofa/node-uuid)
 + [ws](https://github.com/einaros/ws)
 + [nedb](https://github.com/louischatriot/nedb/)
 
 ## installation
-
+1. install the last version of [node.js](http://nodejs.org/)
+2. install all the required modules (see the perious section)
+3. download the source code of this repository by clicking the "Download ZIP" button at the right of the page
 
 ## Licence
 The MIT Licence (MIT) [http://opensource.org/licenses/mit-license.php](http://opensource.org/licenses/mit-license.php)
 
-Copyright (c) 2013 Andy Ching <dogdoglization@gmail.com>
+Copyright (c) 2013 Andy Ching &lt;dogdoglization@gmail.com&gt;
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
