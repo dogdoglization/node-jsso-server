@@ -83,11 +83,16 @@ You are required to install the following node.js modules in order to start the 
 ![alt text](https://raw.github.com/dogdoglization/node-jsso-server/master/readme_resource/how_to_download.png "How to download GitHub repository")
 4. extract the zip file, there should be an "index.js" file in the root folder
 5. open the system console, change to the root directory, and then start the server by entering "node index.js", like this:
+```
 C:\Users\YourAccount>cd The\Directory\Of\The\Folder\You\Extract\From\The\ZIP\File
 The\Directory\Of\The\Folder\You\Extract\From\The\ZIP\File> node index.js
+```
 6. now a JSSO server is listen on port 8080, and a http server is listen on port 80
-7. open a web browser and go to http://localhost/, it is the place for you to control all JSSOs which are found in database.
+
 > you can change the listening port by modify the code in index.js if any problems about the use of port number on your computer
+
+7. open a web browser and go to http://localhost/, it is the place for you to control all JSSOs which are found in database.
+
 > do remember that **Do Not Make Any Change Of "admin.db" JSSO** because you need it to access the database, else this web page will be functionless and you will probably get into trouble
 
 ## Licence
