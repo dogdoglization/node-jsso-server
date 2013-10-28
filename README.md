@@ -1,9 +1,39 @@
 # node-jsso-server
 
-node-jsso-server is aimed for providing a easy solution of app server programming, which is running upon node.js. It services HTML5 app/website clients the server-side object functions through over websocket.
+node-jsso-server is aimed for providing a easy approach of app server/client programming, running upon node.js. 
+It treats each of different groups of server functions as a JavaScript object and represent it as a object-like stub in your HTML5 script.
 
 ## Concept
-node-jsso-server services JavaScript objects (stored in database) as server-side services to the public HTML5 apps/websites over websocket. Each of these objects is simply called JSSO(JavaScript Service Object) in this project; in fact they are just JavaScript objects.
+node-jsso-server services JavaScript objects (stored in internal database) to the HTML5 apps/websites over websocket connection. 
+Each of these objects in the server is called JSSO(JavaScript Service Object). In fact they are no different than normal JavaScript objects.
+All these objects would be maintained by the JSSO server; you can access them remotely through using the "Cloud" constructor that defined in Cloud.js script file.
+
+![alt text](https://raw.github.com/dogdoglization/node-jsso-server/master/readme_resource/architecture_on_web.png "Web view of JSSO server")
+
+Coding JSSO is really easy. For example, naming the following object with ID "my.test":
+```JavaScript
+{
+	hello: function(name) {
+		return "Hello " + name + "!";
+	}
+}
+```
+
+When you want to access the object, you need to get the stub of the JSSO first using "Cloud" constructor:
+```JavaScript
+var jsso = new Cloud("my.test");
+```
+In the background, Cloud.js would try building a WebSocket connection to the server asynchronously:
+![alt text](https://raw.github.com/dogdoglization/node-jsso-server/master/readme_resource/how_to_get_jsso.png "How to get a JSSO stub")
+
+You now can make a call to the function and handle the data return by a callback function:
+```JavaScript
+jsso.invoke("hello", "World", function(data) {
+	alert(data);
+});
+```
+Even it looks ugly, callback function is required because internally it is a asynchronous call:
+![alt text](https://raw.github.com/dogdoglization/node-jsso-server/master/readme_resource/how_to_use_jsso.png "How to use a JSSO stub")
 
 At the server side, you should code your functions in a object as JSSO like this:
 ```JavaScript
@@ -85,8 +115,8 @@ You are required to install the following node.js modules in order to start the 
 5. open the system console, change to the root directory, and then start the server by entering "node index.js", like this:
 
 ```Shell
-C:\Users\YourAccount>cd The\Directory\Of\The\Folder\You\Extract\From\The\ZIP\File
-The\Directory\Of\The\Folder\You\Extract\From\The\ZIP\File> node index.js
+C:\Users\YourAccount> cd The\Directory\Of\TheExtracted\Folder
+The\Directory\Of\TheExtracted\Folder> node index.js
 ```
 
 6. now a JSSO server is listen on port 8080, and a http server is listen on port 80
