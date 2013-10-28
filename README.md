@@ -6,17 +6,17 @@ It treats each of different groups of server functions as a JavaScript object an
 ## Concept
 node-jsso-server services JavaScript objects (stored in internal database) to the HTML5 apps/websites over websocket connection. 
 Each of these objects in the server is called JSSO(JavaScript Service Object). In fact they are no different than normal JavaScript objects.
-All these objects would be maintained by the JSSO server; you can access them remotely through using the "Cloud" constructor that defined in Cloud.js script file.
-
+All these objects would be maintained by the JSSO server; you can access them remotely through using the "Cloud" constructor which is defined in Cloud.js script file.
 ![alt text](https://raw.github.com/dogdoglization/node-jsso-server/master/readme_resource/architecture_on_web.png "Web view of JSSO server")
+
 
 Coding JSSO is really easy. For example, naming the following object with ID "my.test":
 ```JavaScript
-{
+{ //Defination of my.test
 	hello: function(name) {
 		return "Hello " + name + "!";
 	}
-}
+} //End of my.test
 ```
 
 When you want to access the object, you need to get the stub of the JSSO first using "Cloud" constructor:
@@ -26,7 +26,8 @@ var jsso = new Cloud("my.test");
 In the background, Cloud.js would try building a WebSocket connection to the server asynchronously:
 ![alt text](https://raw.github.com/dogdoglization/node-jsso-server/master/readme_resource/how_to_get_jsso.png "How to get a JSSO stub")
 
-You now can make a call to the function and handle the data return by a callback function:
+
+You now can make a call to the function and handle the data return using a callback:
 ```JavaScript
 jsso.invoke("hello", "World", function(data) {
 	alert(data);
@@ -34,6 +35,7 @@ jsso.invoke("hello", "World", function(data) {
 ```
 Even it looks ugly, callback function is required because internally it is a asynchronous call:
 ![alt text](https://raw.github.com/dogdoglization/node-jsso-server/master/readme_resource/how_to_use_jsso.png "How to use a JSSO stub")
+
 
 At the server side, you should code your functions in a object as JSSO like this:
 ```JavaScript
