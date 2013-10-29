@@ -26,16 +26,14 @@ var jsso = new Cloud("my.test");
 In the background, Cloud.js would try building a WebSocket connection to the server asynchronously:
 ![alt text](https://raw.github.com/dogdoglization/node-jsso-server/master/readme_resource/how_to_get_jsso.png "How to get a JSSO stub")
 
-
 You now can make a call to the function and handle the data return using a callback:
 ```JavaScript
 jsso.invoke("hello", "World", function(data) {
 	alert(data);
 });
 ```
-Even it looks ugly, callback function is required because internally it is a asynchronous call:
+Even it looks ugly, callback function is required because internally it is a non-blocking asynchronous call:
 ![alt text](https://raw.github.com/dogdoglization/node-jsso-server/master/readme_resource/how_to_use_jsso.png "How to use a JSSO stub")
-
 
 At the server side, you should code your functions in a object as JSSO like this:
 ```JavaScript
