@@ -24,16 +24,24 @@ When you want to access the object, you need to get the stub of the JSSO first u
 var jsso = new JSSO("my.test");
 ```
 In the background, JSSO.js would try building a WebSocket connection to the server asynchronously:
-![alt text](https://raw.github.com/dogdoglization/node-jsso-server/master/readme_resource/how_to_get_jsso.png "How to get a JSSO stub")
+![alt text](https://raw.github.com/dogdoglization/node-jsso-server/master/readme_resource/how_to_get_stub.png "How to get a JSSO stub")
 
-You now can make the function call and handle the data returned using a cwallback:
+You now can make the function call and handle the data returned using a callback:
 ```JavaScript
-jsso.invoke("hello", "World", function(data) {
+jsso.invoke("hello", "World", function(data) {//here is a syntax sugar
+	alert(data);
+});
+//formally, parameters should wrap in a array
+jsso.invoke("hello", ["World"], function(data) {
+	alert(data);
+});
+//for two or more parameters, it is good for reading
+jsso.invoke("hello", ["World", "Web"], function(data) {
 	alert(data);
 });
 ```
 Even it looks ugly, a callback function is required because it is a non-blocking asynchronous call internally:
-![alt text](https://raw.github.com/dogdoglization/node-jsso-server/master/readme_resource/how_to_use_jsso.png "How to use a JSSO stub")
+![alt text](https://raw.github.com/dogdoglization/node-jsso-server/master/readme_resource/how_to_invoke.png "How to invoke function")
 
 You can also broadcast messages using similar approach:
 ```JavaScript
@@ -51,7 +59,7 @@ You can unregister listener anytime by calling off() function:
 ```JavaScript
 jsso.off("notice"); //unlisten to messages with the name "notice"
 ```
-In addition, you can handle the message in the JSSO before the broadcast action, in which the name of the handler function should be aligned to the messages' name.
+In addition, you can process the message in JSSO before broadcasting, in which the name of the handler function should be the same as messages' name.
 For example, we can reuse the function of my.test as the handler like this:
 ```JavaScript
 jsso.broadcast("hello", "user, this is broadcast message");
@@ -62,6 +70,14 @@ jsso.on("hello", function(data) {
 	alert(data); //get "hello user, this is broadcast message!"
 });
 ```
+![alt text](https://raw.github.com/dogdoglization/node-jsso-server/master/readme_resource/how_to_broadcast.png "How to broadcast message")
+Optionally, you can handle any error occurred during message proccessing, in which a error handler is required:
+```JavaScript
+jsso.broadcast("hello", "something", function(error) {
+	//handle error here
+});
+```
+
 
 At the server side, you should code your functions in a object as JSSO like this:
 ```JavaScript
