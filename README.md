@@ -9,7 +9,7 @@ Each of these objects in the server is called JSSO(JavaScript Service Object). I
 All these objects would be maintained by the JSSO server; you can access them remotely through using the "JSSO" constructor which is defined in JSSO.js script file.
 ![alt text](https://raw.github.com/dogdoglization/node-jsso-server/master/readme_resource/architecture_on_web.png "Web view of JSSO server")
 
-
+### Server Side
 Writing JSSO is really easy. For example, naming the following object with ID "my.test":
 ```JavaScript
 { //Defination of my.test JSSO
@@ -18,8 +18,27 @@ Writing JSSO is really easy. For example, naming the following object with ID "m
 	}
 } //End of my.test
 ```
+At the server side, you should write your JSSOs like this:
+```JavaScript
+{
+	functionName: function(parameter1, parameter2, ...) {
+		...
+		return data; //data to return, can be in boolean, number, string, array or object format
+	},
+	functionName2: function() { ...
+}
+```
+Please save each JSSO with a unique ID/name - just like saving all files under the same folder.
+You may have your JSSOs as many as you like, and naming them whatever you want.
 
-Before access the object, you need to get the stub of the JSSO using "JSSO" constructor:
+### Client Side
+Please include "JSSO.js" before use, it is placed at "/www/JSSO.js" of the repository: 
+```HTML
+<script src="JSSO.js"></script>
+```
+The script will declares a global variable "JSSO", which is used to generate stubs of JSSOs.
+A Stub is used to access corresponding JSSO functions on server.
+For example, You can get a stub of JSSO "my.test" like this:
 ```JavaScript
 var jsso = new JSSO("my.test");
 ```
@@ -78,27 +97,12 @@ jsso.broadcast("hello", "something", function(error) {
 });
 ```
 
+## API
+TO BE CONSTRUCT...
+### Configuration
 
-At the server side, you should code your functions in a object as JSSO like this:
+### Usage - JSSO.js
 ```JavaScript
-{
-	functionName: function(parameter1, parameter2, ...) {
-		...
-		return data; //data to return, can be in boolean, number, string, array or object format
-	},
-	functionName2: function() { ...
-}
-```
-and then save the JSSO in database with a unique ID - just like saving a file and given it a file name.
-You may have your JSSOs as many as you like, and naming them whatever you want.
-
-At the client side, you need including the corresponding script file inside HTML doc which localed at "/www/JSSO.js" of the project: 
-```HTML
-<script src="JSSO.js"></script>
-```
-then call the server functions like this:
-```JavaScript
-var service = new JSSO("your JSSO ID"); //get a stub of JSSO according to given ID
 service.invoke("functionName", //the function name of the JSSO, required
 	["optional", "parameters"], //parameters passed to function, in array form, optional
 	function onSuccess(dataReceived) { //callback, required
@@ -108,39 +112,6 @@ service.invoke("functionName", //the function name of the JSSO, required
 		...
 	});
 ```
-You may also broadcast messages, as well as listen on them:
-```JavaScript
-var service = new JSSO("your JSSO ID");
-service.on("messageName", function onReceived(message) { //listen messages of specified message name from JSSO
-	... //handle message
-});
-service.broadcast("messageName", "message"); //broadcast a message with given message name
-service.off("messageName") //unregister the handler of specified message name
-```
-You may wonder why the message name is required, it is because you can write a message handler at server like this:
-```JavaScript
-/*server side */
-{//your JSSO
-	functionName: function(theMessageToBroadcast) {//the broadcast handler, same as other functions
-		... //handle this message, do whatever you want
-		return messageToAllListeners; //return message that the listeners will received
-	}
-}
-
-/* client side */
-var service = new JSSO("the JSSO ID");
-service.on("functionName", function onReceived(message) { //listen messages of specified message name from JSSO
-	... //handle message
-});
-service.broadcast("functionName", "message"); //broadcast a message with given message name
-service.off("functionName") //unregister the handler of specified message name
-```
-and yes, you right, it's just a function call.
-
-
-to be continue...
-
-## Usage
 
 
 ## Dependencies
