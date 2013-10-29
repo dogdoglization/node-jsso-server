@@ -6,7 +6,7 @@ License: MIT
 
 (function(global) {
      /* variables declaration */
-     var _emptyFunction, CallbackManager, Connections, Connection, Cloud, generateErrorClass;
+     var _emptyFunction, CallbackManager, Connections, Connection, JSSO, generateErrorClass;
     
     _emptyFunction = function() {};
     
@@ -20,9 +20,9 @@ License: MIT
         _map = new Object(),
         //internal counter for _IdGenerator()
         _idCounter = 0,
-        //generator a id of a call between 0 to Cloud.setting.MaximumCallsWaiting
+        //generator a id of a call between 0 to JSSO.setting.MaximumCallsWaiting
         _IdGenerator = function() {
-            return (_idCounter++ % Cloud.setting.MaximumCallsWaiting).toString();
+            return (_idCounter++ % JSSO.setting.MaximumCallsWaiting).toString();
         };
 		
         //register callback functions and return related id
@@ -86,14 +86,14 @@ License: MIT
 				result = JSON.parse(event.data);
 				//json format checking
 				if (typeof result.err !== "boolean" || typeof result.type !== "string" || result.data === undefined || result.ref === undefined || typeof result.evt !== "string")
-					throw new Cloud.ConnectionError("unexpected format of received data: " + event.data);
+					throw new JSSO.ConnectionError("unexpected format of received data: " + event.data);
 				//checking pass
 				
 				//retrieve corresponding callbacks
 				callback = CallbackManager.get(result.ref);
 				//check callbacks validation
 				if (callback === undefined)
-					throw new Cloud.TimeoutError("Function call <ref:" + result.ref + "> was timeout");
+					throw new JSSO.TimeoutError("Function call <ref:" + result.ref + "> was timeout");
 				//valided callbacks
 				
 				//pre-process income message 
@@ -114,11 +114,11 @@ License: MIT
 						break;
 					case "data-error": //server fail to process the require due to data format inconsistency
 					case "error":
-						throw new Cloud.ConnectionError("unexpected server-side error: " + event.data);
+						throw new JSSO.ConnectionError("unexpected server-side error: " + event.data);
 						//TODO: retry?
 						break;
 					default: //it should not be reached
-						throw new Cloud.ConnectionError("unexpected format of received data: " + event.data);
+						throw new JSSO.ConnectionError("unexpected format of received data: " + event.data);
 				}
 				
 				//get corresponding callback function, either success or error
@@ -136,20 +136,20 @@ License: MIT
 					case "Array":
 						func(JSON.parse(result.data));
 						break;
-					case 'CloudScriptError':
-						func(new Cloud.ScriptError(result.data));
+					case 'JSSOScriptError':
+						func(new JSSO.ScriptError(result.data));
 						break;
-					case 'CloudServerError':
-						func(new Cloud.ServerError(result.data));
+					case 'JSSOServerError':
+						func(new JSSO.ServerError(result.data));
 						break;
-					case "CloudConnectionError":
-						func(new Cloud.ConnectionError(result.data));
+					case "JSSOConnectionError":
+						func(new JSSO.ConnectionError(result.data));
 						break;
-					case "CloudObjectNotFoundError":
-						func(new Cloud.ObjectNotFoundError(result.data));
+					case "JSSOObjectNotFoundError":
+						func(new JSSO.ObjectNotFoundError(result.data));
 						break;
-					case "CloudFunctionNotFoundError":
-						func(new Cloud.FunctionNotFoundError(result.data));
+					case "JSSOFunctionNotFoundError":
+						func(new JSSO.FunctionNotFoundError(result.data));
 						break;
 					default: //object: null or client-customized object type
 						if (result.data === null)
@@ -160,13 +160,13 @@ License: MIT
 								break;
 							}
 							catch (err) {
-								callback.error(new Cloud.ScriptError("Cannot rebuild server-returned object <type: " + result.type + ">."));
+								callback.error(new JSSO.ScriptError("Cannot rebuild server-returned object <type: " + result.type + ">."));
 							}
-							callback.error(new Cloud.ScriptError("Cannot rebuild server-returned object <type: " + result.type + ">."));
+							callback.error(new JSSO.ScriptError("Cannot rebuild server-returned object <type: " + result.type + ">."));
 						}
 				}
 			} catch (err) {
-				Cloud.onError(err);
+				JSSO.onError(err);
 			}
 		};
 		//on websocket error event handler
@@ -177,7 +177,7 @@ License: MIT
 		
 		rebuildConnection = function() { //rebuild the connection while unavailable
 			ws.close();
-			var times = Cloud.setting.TimesOfConnectionRebuild;
+			var times = JSSO.setting.TimesOfConnectionRebuild;
 			var rebuild = function() {
 				console.log("connection <" + wsUrl +"> rebuilding... " + --times + " times left");
 				ws = new WebSocket(wsUrl);
@@ -201,9 +201,9 @@ License: MIT
 						if (times > 0) //retry
 							rebuild();
 						else //rebuild process failed
-							Cloud.onError(new Cloud.ConnectionError()); //throw exception to user
+							JSSO.onError(new JSSO.ConnectionError()); //throw exception to user
 					}
-				}, Cloud.setting.ConnectionRebuildInterval);
+				}, JSSO.setting.ConnectionRebuildInterval);
 				
 				
 			};
@@ -235,7 +235,7 @@ License: MIT
 			//register callbacks
 			callInfo["ref"] =  CallbackManager.register(
 				{"success": successCallback, "error":errorCallback}, 
-				(callInfo.type === "listen")? Cloud.setting.MessageListeningTimeout : Cloud.setting.FunctionInvokingTimeout); //set timeout by calling type
+				(callInfo.type === "listen")? JSSO.setting.MessageListeningTimeout : JSSO.setting.FunctionInvokingTimeout); //set timeout by calling type
 			//put into buffer
 			callStack.push(callInfo);
 			//flush with all calls previously remained
@@ -255,21 +255,21 @@ License: MIT
 	};
 	/* end of Connection defination */
 	
-    /* define the Cloud class */
-    Cloud = function(jssoId, server) {
+    /* define the JSSO class */
+    JSSO = function(jssoId, server) {
          /*
-         * usage: new Cloud(jssoid) || new Cloud(jssoid, server)
+         * usage: new JSSO(jssoid) || new JSSO(jssoid, server)
          * 
          * @jssoid {string} the id of JSSO
-         * @server {Object} the server to connect for getting jsso, included host and port, default as Cloud.setting.server, optional
+         * @server {Object} the server to connect for getting jsso, included host and port, default as JSSO.setting.server, optional
          */
          
         /* variables declaration */
         var host, port, currentUrl, conn;
         
-        //retrieve host and port if given, default to properties in Cloud.setting.server
-        host = (server && server.host)? server.host : Cloud.setting.server.host;
-        port = (server && server.port)? server.port : Cloud.setting.server.port;
+        //retrieve host and port if given, default to properties in JSSO.setting.server
+        host = (server && server.host)? server.host : JSSO.setting.server.host;
+        port = (server && server.port)? server.port : JSSO.setting.server.port;
         
         //retrieve the newest url, since it may be changed by user
         currentUrl = "ws://" + host + ":" + port + "/jsso/ws";
@@ -394,11 +394,11 @@ License: MIT
                 throw new SyntaxError("Function name argument must be a string");
         };
     };
-    /* end of Cloud defination */
+    /* end of JSSO defination */
     
     
     /* settings */
-    Cloud.setting = {
+    JSSO.setting = {
         "server": { // Server Location Setting
             "host": "localhost",
             "port": 8080
@@ -411,13 +411,13 @@ License: MIT
     };
     
     /* user-bindable handler for receiving any macro errors that cannot processed with function invocation callbacks */
-    Cloud.onError = function(error) {
+    JSSO.onError = function(error) {
         console.log(error.stack);
     };
     
-    /* Cloud Errors defination */
+    /* JSSO Errors defination */
     //defination of Error Class generator
-    //use to construct cloud error classes during Cloud building
+    //use to construct JSSO error classes during JSSO building
     generateErrorClass = function(errorName, defaultMessage, parentClass) {
         var error = function(message) {
             this.name = errorName;
@@ -428,29 +428,29 @@ License: MIT
     };
     
     // ConnectionError: problems on websocket connection and data exchange
-    Cloud.ConnectionError = generateErrorClass("CloudConnectionError", "fail to connect with server");
+    JSSO.ConnectionError = generateErrorClass("JSSOConnectionError", "fail to connect with server");
     //ServerError: problems found at server side
-    Cloud.ServerError = generateErrorClass("CloudServerError", "an error occur at server");
+    JSSO.ServerError = generateErrorClass("JSSOServerError", "an error occur at server");
     //ServerScriptError: script execution problems reported by the server
-    Cloud.ScriptError = generateErrorClass("CloudScriptError", "an problem found inside the server script");
+    JSSO.ScriptError = generateErrorClass("JSSOScriptError", "an problem found inside the server script");
 	//TimeoutError: 1.server script was running over the time limit and was forced to close at server side 
 	//				2.event handler was expired and removed, and now cannot handle the event
-    Cloud.TimeoutError = generateErrorClass("CloudTimeoutError", "Function call was timeout");
-	//ObjectNotFoundError: specified object (by new Cloud(<object ID>)) cannot be found at server side
-	Cloud.ObjectNotFoundError = generateErrorClass("CloudObjectNotFoundError", "Cloud object is not found", ReferenceError);
+    JSSO.TimeoutError = generateErrorClass("JSSOTimeoutError", "Function call was timeout");
+	//ObjectNotFoundError: specified object (by new JSSO(<object ID>)) cannot be found at server side
+	JSSO.ObjectNotFoundError = generateErrorClass("JSSOObjectNotFoundError", "JSSO object is not found", ReferenceError);
 	//FunctionNotFoundError: specified function (by invoke() or broadcast()) cannot be found at server side
-	Cloud.FunctionNotFoundError = generateErrorClass("CloudFunctionNotFoundError", "function is not defined", ReferenceError);
+	JSSO.FunctionNotFoundError = generateErrorClass("JSSOFunctionNotFoundError", "function is not defined", ReferenceError);
     /* end of Errors defination */
     
-    //bind the Cloud object to global scope
-    global.Cloud = Cloud;
+    //bind the JSSO object to global scope
+    global.JSSO = JSSO;
     
-    //run user-defined setting placed inside the script tag which endswith "cloud.js", case-insensitive
+    //run user-defined setting placed inside the script tag which endswith "JSSO.js", case-insensitive
     if (document !== undefined) { //check if accessing document is valided
         var scripttags = document.getElementsByTagName("script");
         for (var i in scripttags) {
             var s = scripttags.item(i);
-            if (s.hasAttribute("src") && s.getAttribute("src").match(/cloud.js$/i) && typeof s.textContent === "string" && s.textContent.length > 0)
+            if (s.hasAttribute("src") && s.getAttribute("src").match(/JSSO.js$/i) && typeof s.textContent === "string" && s.textContent.length > 0)
                 //tag was found and it contains script code
                 try {
                     eval(s.textContent); //run script inside the tag

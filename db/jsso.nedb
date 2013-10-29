@@ -1,2 +1,0 @@
-{"id":"com.test.example2","src":"{\n\tid: \"com.test.example2\",\n\tfunc: function (name) {\n\t\tif (!name) name = \"world\";\n\t\treturn \"Hello \" + name + \"!\";\n\t}\n}","_id":"MxGo318uYj0tGZ2j"}
-{"id":"com.test.example","src":"{\n\tid: \"com.test.example\",\n\tfunc: function () {\n\t\tvar list = arguments[0] || \"client\";\n\t\tfor (var i=1; i<arguments.length; i++)\n\t\t\tlist += \",\" + arguments[i];\n\t\tvar obj = new this.Cloud(\"com.test.example2\");\n\t\tobj.invoke(\"func\", list, function(data) {\n\t\t\treturn data;\n\t\t});\n\t}\n}","_id":"mX8PorchSSNHwKrE"}

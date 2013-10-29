@@ -6,7 +6,7 @@ It treats each of different groups of server functions as a JavaScript object an
 ## Concept
 node-jsso-server services JavaScript objects (stored in internal database) to the HTML5 apps/websites over websocket connection. 
 Each of these objects in the server is called JSSO(JavaScript Service Object). In fact they are no different than normal JavaScript objects.
-All these objects would be maintained by the JSSO server; you can access them remotely through using the "Cloud" constructor which is defined in Cloud.js script file.
+All these objects would be maintained by the JSSO server; you can access them remotely through using the "JSSO" constructor which is defined in JSSO.js script file.
 ![alt text](https://raw.github.com/dogdoglization/node-jsso-server/master/readme_resource/architecture_on_web.png "Web view of JSSO server")
 
 
@@ -19,11 +19,11 @@ Writing JSSO is really easy. For example, naming the following object with ID "m
 } //End of my.test
 ```
 
-When you want to access the object, you need to get the stub of the JSSO first using "Cloud" constructor:
+When you want to access the object, you need to get the stub of the JSSO first using "JSSO" constructor:
 ```JavaScript
-var jsso = new Cloud("my.test");
+var jsso = new JSSO("my.test");
 ```
-In the background, Cloud.js would try building a WebSocket connection to the server asynchronously:
+In the background, JSSO.js would try building a WebSocket connection to the server asynchronously:
 ![alt text](https://raw.github.com/dogdoglization/node-jsso-server/master/readme_resource/how_to_get_jsso.png "How to get a JSSO stub")
 
 You now can make the function call and handle the data returned using a cwallback:
@@ -42,7 +42,7 @@ jsso.broadcast("notice", "It's a test!");
 The above script attempts broadcasting the message "It's a test!" with the name "notice" through my.test JSSO.
 On the other hand, to listen these messages at other app instances you should:
 ```JavaScript
-var jsso = new Cloud("my.test"); //get a new stub of the same JSSO first
+var jsso = new JSSO("my.test"); //get a new stub of the same JSSO first
 jsso.on("notice", function(data) { //listen messages with the the name "notice"
 	alert(data);
 });
@@ -76,13 +76,13 @@ At the server side, you should code your functions in a object as JSSO like this
 and then save the JSSO in database with a unique ID - just like saving a file and given it a file name.
 You may have your JSSOs as many as you like, and naming them whatever you want.
 
-At the client side, you need including the corresponding script file inside HTML doc which localed at "/www/cloud.js" of the project: 
+At the client side, you need including the corresponding script file inside HTML doc which localed at "/www/JSSO.js" of the project: 
 ```HTML
-<script src="cloud.js"></script>
+<script src="JSSO.js"></script>
 ```
 then call the server functions like this:
 ```JavaScript
-var service = new Cloud("your JSSO ID"); //get a stub of JSSO according to given ID
+var service = new JSSO("your JSSO ID"); //get a stub of JSSO according to given ID
 service.invoke("functionName", //the function name of the JSSO, required
 	["optional", "parameters"], //parameters passed to function, in array form, optional
 	function onSuccess(dataReceived) { //callback, required
@@ -94,7 +94,7 @@ service.invoke("functionName", //the function name of the JSSO, required
 ```
 You may also broadcast messages, as well as listen on them:
 ```JavaScript
-var service = new Cloud("your JSSO ID");
+var service = new JSSO("your JSSO ID");
 service.on("messageName", function onReceived(message) { //listen messages of specified message name from JSSO
 	... //handle message
 });
@@ -112,7 +112,7 @@ You may wonder why the message name is required, it is because you can write a m
 }
 
 /* client side */
-var service = new Cloud("the JSSO ID");
+var service = new JSSO("the JSSO ID");
 service.on("functionName", function onReceived(message) { //listen messages of specified message name from JSSO
 	... //handle message
 });
@@ -141,18 +141,13 @@ You are required to install the following node.js modules in order to start the 
 ![alt text](https://raw.github.com/dogdoglization/node-jsso-server/master/readme_resource/how_to_download.png "How to download GitHub repository")
 4. extract the zip file, there should be an "index.js" file in the root folder
 5. open the system console, change to the root directory, and then start the server by entering "node index.js", like this:
-
 ```Shell
 C:\Users\YourAccount> cd The\Directory\Of\TheExtracted\Folder
 The\Directory\Of\TheExtracted\Folder> node index.js
 ```
-
-6. now a JSSO server is listen on port 8080, and a http server is listen on port 80
-
-> you can change the listening port by modify the code in index.js if any problems about the use of port number on your computer.
-
+6. now the JSSO server instance listen on port 8080, and a http server instance listen on port 80
+> you can change the ports by modify the code in index.js if any problems about the use of port number on your computer.
 7. open a web browser and go to http://localhost/, it is the place for you to control all JSSOs which are found in database.
-
 > do remember that **Do Not Make Any Change Of "admin.db" JSSO** because you need it to access the database, else this web page will be functionless and you will probably get into trouble.
 
 ## Licence

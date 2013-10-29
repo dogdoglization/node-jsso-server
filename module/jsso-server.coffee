@@ -17,30 +17,30 @@ exports.start = (options) ->
 		UUID = require('node-uuid')
 		() -> UUID.v4()
 
-	#function to generate Cloud class
-	#all Cloud instances of the returned Cloud class share the same execution object
-	generateCloud = (execution) ->
+	#function to generate JSSO class
+	#all JSSO instances of the returned JSSO class share the same execution object
+	generateJSSO = (execution) ->
 			
-			class Cloud
-				#public static members of Cloud Errors
+			class JSSO
+				#public static members of JSSO Errors
 				@ConnectionError: class extends Error
 					constructor: (@message = "problem while data transferring") ->
-						@name = "CloudConnectionError"
+						@name = "JSSOConnectionError"
 				@ServerError: class extends Error
 					constructor: (@message = "an error occur at server") ->
-						@name = "CloudServerError"
+						@name = "JSSOServerError"
 				@ScriptError: class extends Error
 					constructor: (@message = "an problem found inside the server script") ->
-						@name = "CloudScriptError"
+						@name = "JSSOScriptError"
 				@TimeoutError: class extends Error
 					constructor: (@message = "function call was timeout") ->
-						@name = "CloudTimeoutError"
+						@name = "JSSOTimeoutError"
 				@ObjectNotFoundError: class extends ReferenceError
 					constructor: (@message = "object is not defined") ->
-						@name = "CloudObjectNotFoundError"
+						@name = "JSSOObjectNotFoundError"
 				@FunctionNotFoundError: class extends ReferenceError
 					constructor: (@message = "function is not defined") ->
-						@name = "CloudFunctionNotFoundError"
+						@name = "JSSOFunctionNotFoundError"
 				
 				constructor: (@jssoId, @server) ->
 				
@@ -86,7 +86,7 @@ exports.start = (options) ->
 							'args': parameters
 						},
 						(err, result) =>
-							if (not err) or err instanceof Cloud.FunctionNotFoundError
+							if (not err) or err instanceof JSSO.FunctionNotFoundError
 								try
 									listener(result || originParam) for listener in EvtMgr.getEventListeners(@jssoId, functionName)
 									return #avoid unnecessary action generate by CoffeeScript
@@ -117,13 +117,13 @@ exports.start = (options) ->
 	class Execution
 		constructor: (@onFinish = emptyFunction) ->
 			###
-			# 3 private variables accessable by this object: Cloud, stack, counter
+			# 3 private variables accessable by this object: JSSO, stack, counter
 			# 1 private function accessable by this object: executeTasks
 			# 2 object function (as public interfaces) accessing the above members: addTask, run
 			# notice that prototype functions CANNOT access these private members,
 			# members declared in between class and constructor are accessable by all class instances, also known as private static
 			###
-			Cloud = generateCloud(this)
+			JSSO = generateJSSO(this)
 			stack = [] #private instance, buffering tasks
 			counter = 0 #private instance, counting how many tasks are in processes
 			executeTasks = () ->
@@ -136,19 +136,19 @@ exports.start = (options) ->
 						else
 							if typeof jsso isnt "object"
 								--counter
-								callback(new Cloud.ObjectNotFoundError("object <" + invokeInfo.id + "> is not defined"), null)
+								callback(new JSSO.ObjectNotFoundError("object <" + invokeInfo.id + "> is not defined"), null)
 							else if typeof jsso[invokeInfo.func] isnt "function"
 								--counter
-								callback(new Cloud.FunctionNotFoundError("function <" + invokeInfo.func + "> is not defined"), null)
+								callback(new JSSO.FunctionNotFoundError("function <" + invokeInfo.func + "> is not defined"), null)
 							else
 								jsso.invokeType = invokeInfo.type
 								invokeInfo.args = JSON.parse(invokeInfo.args) if typeof invokeInfo.args is 'string' #turn params string to Array if needed
 								if not invokeInfo.args instanceof Array #it should now be a array
 									--counter
-									callback(new Cloud.ConnectionError "invalided data passed to server function", null)
+									callback(new JSSO.ConnectionError "invalided data passed to server function", null)
 								else
 									#initialize global variables for accessing by jsso
-									global.Cloud = Cloud
+									global.JSSO = JSSO
 									global.error = global.response = null
 									try
 										#if it return a function, assume that it requires low-level operation
@@ -225,7 +225,7 @@ exports.start = (options) ->
 				typeof invokeInfo.func is "string" and
 				if invokeInfo.args then typeof invokeInfo.args is "string" else true)
 					clientws.send(JSON.stringify formOutput( #return data error
-						new Cloud.ConnectionError "invalided data received by server",
+						new JSSO.ConnectionError "invalided data received by server",
 						true, {'ref': invokeinfo.ref, 'evt': "data-error"}))
 				
 				switch invokeInfo.type
@@ -237,7 +237,7 @@ exports.start = (options) ->
 					when "broadcast"
 						(new Execution((err, result) ->
 							#simply broadcast the args message if no corresponding function (as handler)
-							if (not err) or err.name is "CloudFunctionNotFoundError"
+							if (not err) or err.name is "JSSOFunctionNotFoundError"
 								try
 									msg = result || (if invokeInfo.args.length is 1 then invokeInfo.args[0] else invokeInfo.args)
 									for listener in EvtMgr.getEventListeners(invokeInfo.id, invokeInfo.func)
@@ -270,7 +270,7 @@ exports.start = (options) ->
 								"no events in listening", false, {'ref': invokeInfo.ref, 'evt': "unlisten"}))
 					else #it should not be reached: no corresponding event
 						clientws.send(JSON.stringify formOutput( #return data error
-							new Cloud.ConnectionError "invalided data received by server",
+							new JSSO.ConnectionError "invalided data received by server",
 							true, {'ref': invokeinfo.ref, 'evt': "data-error"}))
 			catch err #it should not be reached
 				console.log("runtime error: " + err.stack);

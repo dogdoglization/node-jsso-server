@@ -4,6 +4,12 @@ Email: dogdoglization@gmail.com
 License: MIT
 */
 
+/*
+ *Usage:
+ *toString(object|array) -> string, turn a JavaScript object or array into string, function will be stringified also
+ *toObject(string) -> object, rebuild a JavaScript object from its string representation
+*/
+
 var toString, toObject;
 
 toString = function(obj) {

@@ -51,8 +51,8 @@ License: MIT
 		  <script src="js/respond.min.js"></script>
 		<![endif]-->
 		<script src="js/angular.min.js"></script>
-		<script src="cloud.js">
-			Cloud.setting.server = {
+		<script src="JSSO.js">
+			JSSO.setting.server = {
 				host: "ztony84.no-ip.biz",
 				port: "49161"
 			};
@@ -162,7 +162,7 @@ License: MIT
 		</div>
 
 		<script>
-			var db = new Cloud("admin.db");
+			var db = new JSSO("admin.db");
 			var codeEditor = CodeMirror($("#editor").get(0), {
 				mode: {
 					name: "javascript",

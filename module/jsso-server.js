@@ -11,7 +11,7 @@ License: MIT
     __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
 
   exports.start = function(options) {
-    var DatabaseFilePath, EvtMgr, Execution, db, emptyFunction, formOutput, generateCloud, initialJssoDirectory, ost, uuid, webSocketPort, webSocketServer;
+    var DatabaseFilePath, EvtMgr, Execution, db, emptyFunction, formOutput, generateJSSO, initialJssoDirectory, ost, uuid, webSocketPort, webSocketServer;
     webSocketPort = options.port || 8080;
     DatabaseFilePath = options.db || null;
     initialJssoDirectory = options.importDir;
@@ -26,87 +26,87 @@ License: MIT
         return UUID.v4();
       };
     })();
-    generateCloud = function(execution) {
-      var Cloud;
-      return Cloud = (function() {
-        Cloud.ConnectionError = (function(_super) {
+    generateJSSO = function(execution) {
+      var JSSO;
+      return JSSO = (function() {
+        JSSO.ConnectionError = (function(_super) {
           __extends(_Class, _super);
 
           function _Class(message) {
             this.message = message != null ? message : "problem while data transferring";
-            this.name = "CloudConnectionError";
+            this.name = "JSSOConnectionError";
           }
 
           return _Class;
 
         })(Error);
 
-        Cloud.ServerError = (function(_super) {
+        JSSO.ServerError = (function(_super) {
           __extends(_Class, _super);
 
           function _Class(message) {
             this.message = message != null ? message : "an error occur at server";
-            this.name = "CloudServerError";
+            this.name = "JSSOServerError";
           }
 
           return _Class;
 
         })(Error);
 
-        Cloud.ScriptError = (function(_super) {
+        JSSO.ScriptError = (function(_super) {
           __extends(_Class, _super);
 
           function _Class(message) {
             this.message = message != null ? message : "an problem found inside the server script";
-            this.name = "CloudScriptError";
+            this.name = "JSSOScriptError";
           }
 
           return _Class;
 
         })(Error);
 
-        Cloud.TimeoutError = (function(_super) {
+        JSSO.TimeoutError = (function(_super) {
           __extends(_Class, _super);
 
           function _Class(message) {
             this.message = message != null ? message : "function call was timeout";
-            this.name = "CloudTimeoutError";
+            this.name = "JSSOTimeoutError";
           }
 
           return _Class;
 
         })(Error);
 
-        Cloud.ObjectNotFoundError = (function(_super) {
+        JSSO.ObjectNotFoundError = (function(_super) {
           __extends(_Class, _super);
 
           function _Class(message) {
             this.message = message != null ? message : "object is not defined";
-            this.name = "CloudObjectNotFoundError";
+            this.name = "JSSOObjectNotFoundError";
           }
 
           return _Class;
 
         })(ReferenceError);
 
-        Cloud.FunctionNotFoundError = (function(_super) {
+        JSSO.FunctionNotFoundError = (function(_super) {
           __extends(_Class, _super);
 
           function _Class(message) {
             this.message = message != null ? message : "function is not defined";
-            this.name = "CloudFunctionNotFoundError";
+            this.name = "JSSOFunctionNotFoundError";
           }
 
           return _Class;
 
         })(ReferenceError);
 
-        function Cloud(jssoId, server) {
+        function JSSO(jssoId, server) {
           this.jssoId = jssoId;
           this.server = server;
         }
 
-        Cloud.prototype.invoke = function() {
+        JSSO.prototype.invoke = function() {
           var args, err, functionName, onError, onSuccess, parameter;
           try {
             args = Array.prototype.slice.call(arguments);
@@ -138,7 +138,7 @@ License: MIT
           }
         };
 
-        Cloud.prototype.broadcast = function() {
+        JSSO.prototype.broadcast = function() {
           var args, functionName, onError, originParam, parameters,
             _this = this;
           args = Array.prototype.slice.call(arguments);
@@ -155,7 +155,7 @@ License: MIT
             'args': parameters
           }, function(err, result) {
             var listener, _i, _len, _ref;
-            if ((!err) || err instanceof Cloud.FunctionNotFoundError) {
+            if ((!err) || err instanceof JSSO.FunctionNotFoundError) {
               try {
                 _ref = EvtMgr.getEventListeners(_this.jssoId, functionName);
                 for (_i = 0, _len = _ref.length; _i < _len; _i++) {
@@ -171,7 +171,7 @@ License: MIT
           });
         };
 
-        Cloud.prototype.on = function(functionName, callback, onError) {
+        JSSO.prototype.on = function(functionName, callback, onError) {
           if (onError == null) {
             onError = emptyFunction;
           }
@@ -184,7 +184,7 @@ License: MIT
           EvtMgr.listenEvent(this.jssoId, functionName, this.listenerId, callback);
         };
 
-        Cloud.prototype.off = function(functionName) {
+        JSSO.prototype.off = function(functionName) {
           if (typeof functionName !== "string") {
             throw new SyntaxError("Function name argument must be a string");
           }
@@ -193,23 +193,23 @@ License: MIT
           }
         };
 
-        return Cloud;
+        return JSSO;
 
       })();
     };
     Execution = (function() {
       function Execution(onFinish) {
-        var Cloud, counter, executeTasks, stack;
+        var JSSO, counter, executeTasks, stack;
         this.onFinish = onFinish != null ? onFinish : emptyFunction;
         /*
-        			# 3 private variables accessable by this object: Cloud, stack, counter
+        			# 3 private variables accessable by this object: JSSO, stack, counter
         			# 1 private function accessable by this object: executeTasks
         			# 2 object function (as public interfaces) accessing the above members: addTask, run
         			# notice that prototype functions CANNOT access these private members,
         			# members declared in between class and constructor are accessable by all class instances, also known as private static
         */
 
-        Cloud = generateCloud(this);
+        JSSO = generateJSSO(this);
         stack = [];
         counter = 0;
         executeTasks = function() {
@@ -223,10 +223,10 @@ License: MIT
               } else {
                 if (typeof jsso !== "object") {
                   --counter;
-                  callback(new Cloud.ObjectNotFoundError("object <" + invokeInfo.id + "> is not defined"), null);
+                  callback(new JSSO.ObjectNotFoundError("object <" + invokeInfo.id + "> is not defined"), null);
                 } else if (typeof jsso[invokeInfo.func] !== "function") {
                   --counter;
-                  callback(new Cloud.FunctionNotFoundError("function <" + invokeInfo.func + "> is not defined"), null);
+                  callback(new JSSO.FunctionNotFoundError("function <" + invokeInfo.func + "> is not defined"), null);
                 } else {
                   jsso.invokeType = invokeInfo.type;
                   if (typeof invokeInfo.args === 'string') {
@@ -234,9 +234,9 @@ License: MIT
                   }
                   if (!invokeInfo.args instanceof Array) {
                     --counter;
-                    callback(new Cloud.ConnectionError("invalided data passed to server function", null));
+                    callback(new JSSO.ConnectionError("invalided data passed to server function", null));
                   } else {
-                    global.Cloud = Cloud;
+                    global.JSSO = JSSO;
                     global.error = global.response = null;
                     try {
                       if (typeof (global.response = jsso[invokeInfo.func].apply(jsso, invokeInfo.args)) === "function") {
@@ -330,7 +330,7 @@ License: MIT
         try {
           invokeInfo = JSON.parse(msg);
           if (!(typeof (invokeInfo != null ? invokeInfo.id : void 0) === "string" && typeof invokeInfo.type === "string" && invokeInfo.type.match(/(invoke|broadcast|listen|unlisten)/) && typeof invokeInfo.func === "string" && (invokeInfo.args ? typeof invokeInfo.args === "string" : true))) {
-            clientws.send(JSON.stringify(formOutput(new Cloud.ConnectionError("invalided data received by server", true, {
+            clientws.send(JSON.stringify(formOutput(new JSSO.ConnectionError("invalided data received by server", true, {
               'ref': invokeinfo.ref,
               'evt': "data-error"
             }))));
@@ -346,7 +346,7 @@ License: MIT
             case "broadcast":
               return (new Execution(function(err, result) {
                 var listener, _fn, _i, _len, _ref;
-                if ((!err) || err.name === "CloudFunctionNotFoundError") {
+                if ((!err) || err.name === "JSSOFunctionNotFoundError") {
                   try {
                     msg = result || (invokeInfo.args.length === 1 ? invokeInfo.args[0] : invokeInfo.args);
                     _ref = EvtMgr.getEventListeners(invokeInfo.id, invokeInfo.func);
@@ -401,7 +401,7 @@ License: MIT
               }
               break;
             default:
-              return clientws.send(JSON.stringify(formOutput(new Cloud.ConnectionError("invalided data received by server", true, {
+              return clientws.send(JSON.stringify(formOutput(new JSSO.ConnectionError("invalided data received by server", true, {
                 'ref': invokeinfo.ref,
                 'evt': "data-error"
               }))));
