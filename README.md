@@ -149,6 +149,7 @@ You are required to install the following node.js modules in order to start the 
 + [node-static](https://github.com/cloudhead/node-static), required by /index.js
 + [node-uuid](https://github.com/broofa/node-uuid), required by /module/jsso-server.js
 + [ws](https://github.com/einaros/ws), required by /module/jsso-server.js
+
 You can install them by using npm in console:
 ```Shell
 > npm install <dependency>
