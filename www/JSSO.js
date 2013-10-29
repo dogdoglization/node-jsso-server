@@ -228,7 +228,7 @@ License: MIT
 				default:
 					rebuildConnection();
 			}
-        };
+		};
 		
 		//interface of sending message to server
 		this.send = function(callInfo, successCallback, errorCallback) {

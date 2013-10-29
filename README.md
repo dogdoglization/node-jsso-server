@@ -19,7 +19,7 @@ Writing JSSO is really easy. For example, naming the following object with ID "m
 } //End of my.test
 ```
 
-When you want to access the object, you need to get the stub of the JSSO first using "JSSO" constructor:
+Before access the object, you need to get the stub of the JSSO using "JSSO" constructor:
 ```JavaScript
 var jsso = new JSSO("my.test");
 ```
