@@ -10,15 +10,7 @@ All these objects would be maintained by the JSSO server; you can access them re
 ![alt text](https://raw.github.com/dogdoglization/node-jsso-server/master/readme_resource/architecture_on_web.png "Web view of JSSO server")
 
 ### Server Side
-Writing JSSO is really easy. For example, naming the following object with ID "my.test":
-```JavaScript
-{ //Defination of my.test JSSO
-	hello: function(name) {
-		return "Hello " + name + "!";
-	}
-} //End of my.test
-```
-At the server side, you should write your JSSOs like this:
+You should write your JSSOs like this:
 ```JavaScript
 {
 	functionName: function(parameter1, parameter2, ...) {
@@ -28,8 +20,16 @@ At the server side, you should write your JSSOs like this:
 	functionName2: function() { ...
 }
 ```
-Please save each JSSO with a unique ID/name - just like saving all files under the same folder.
+and save each JSSO with a unique ID/name - just like saving all files under the same folder.
 You may have your JSSOs as many as you like, and naming them whatever you want.
+Writing JSSO is really easy. For example, naming the following object with ID "my.test":
+```JavaScript
+{ //Defination of my.test JSSO
+	hello: function(name) {
+		return "Hello " + name + "!";
+	}
+} //End of my.test
+```
 
 ### Client Side
 Please include "JSSO.js" before use, it is placed at "/www/JSSO.js" of the repository: 
