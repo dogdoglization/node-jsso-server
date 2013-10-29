@@ -18,9 +18,9 @@ cloneObject = (obj) ->
 ###
 # the db object to export.
 # get: function(id: string, callback: function(error, object)), 
-#       pass object to callback acorrding to id
+# 		pass object to callback acorrding to id
 # set: function(id: string, objectOrString: object|string, callback: function(error, object)),
-#       save object to db and indexed by id. convert to object if it is a string. pass the object to callback
+# 		save object to db and indexed by id. convert to object if it is a string. pass the object to callback
 ###
 class DB
 	constructor: (dbFilePath, initialJssoDir) ->
