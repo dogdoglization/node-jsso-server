@@ -145,10 +145,10 @@ to be continue...
 
 ## Dependencies
 You are required to install the following node.js modules in order to start the server:
-+ [express](https://github.com/visionmedia/express)
-+ [node-uuid](https://github.com/broofa/node-uuid)
-+ [ws](https://github.com/einaros/ws)
-+ [nedb](https://github.com/louischatriot/nedb/)
++ [express](https://github.com/visionmedia/express), required by /index.js
++ [node-uuid](https://github.com/broofa/node-uuid), required by /module/jsso-server.js
++ [nedb](https://github.com/louischatriot/nedb/), required by /module/db.js
++ [ws](https://github.com/einaros/ws), required by /module/jsso-server.js
 
 ## installation
 1. install the last version of [node.js](http://nodejs.org/)
