@@ -10,9 +10,9 @@ All these objects would be maintained by the JSSO server; you can access them re
 ![alt text](https://raw.github.com/dogdoglization/node-jsso-server/master/readme_resource/architecture_on_web.png "Web view of JSSO server")
 
 
-Coding JSSO is really easy. For example, naming the following object with ID "my.test":
+Writing JSSO is really easy. For example, naming the following object with ID "my.test":
 ```JavaScript
-{ //Defination of my.test
+{ //Defination of my.test JSSO
 	hello: function(name) {
 		return "Hello " + name + "!";
 	}
@@ -26,14 +26,42 @@ var jsso = new Cloud("my.test");
 In the background, Cloud.js would try building a WebSocket connection to the server asynchronously:
 ![alt text](https://raw.github.com/dogdoglization/node-jsso-server/master/readme_resource/how_to_get_jsso.png "How to get a JSSO stub")
 
-You now can make a call to the function and handle the data return using a callback:
+You now can make the function call and handle the data returned using a cwallback:
 ```JavaScript
 jsso.invoke("hello", "World", function(data) {
 	alert(data);
 });
 ```
-Even it looks ugly, callback function is required because internally it is a non-blocking asynchronous call:
+Even it looks ugly, a callback function is required because it is a non-blocking asynchronous call internally:
 ![alt text](https://raw.github.com/dogdoglization/node-jsso-server/master/readme_resource/how_to_use_jsso.png "How to use a JSSO stub")
+
+You can also broadcast messages using similar approach:
+```JavaScript
+jsso.broadcast("notice", "It's a test!");
+```
+The above script attempts broadcasting the message "It's a test!" with the name "notice" through my.test JSSO.
+On the other hand, to listen these messages at other app instances you should:
+```JavaScript
+var jsso = new Cloud("my.test"); //get a new stub of the same JSSO first
+jsso.on("notice", function(data) { //listen messages with the the name "notice"
+	alert(data);
+});
+```
+You can unregister listener anytime by calling off() function:
+```JavaScript
+jsso.off("notice"); //unlisten to messages with the name "notice"
+```
+In addition, you can handle the message in the JSSO before the broadcast action, in which the name of the handler function should be aligned to the messages' name.
+For example, we can reuse the function of my.test as the handler like this:
+```JavaScript
+jsso.broadcast("hello", "user, this is broadcast message");
+```
+This message would be passed as the parameter of the function and JSSO server will broadcast the result of the function, instead of the message itself:
+```JavaScript
+jsso.on("hello", function(data) {
+	alert(data); //get "hello user, this is broadcast message!"
+});
+```
 
 At the server side, you should code your functions in a object as JSSO like this:
 ```JavaScript
