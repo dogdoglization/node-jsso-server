@@ -144,10 +144,10 @@ to be continue...
 
 
 ## Dependencies
-You are required to install the following node.js modules in order to start the server:
-+ [express](https://github.com/visionmedia/express), required by /index.js
-+ [node-uuid](https://github.com/broofa/node-uuid), required by /module/jsso-server.js
+You are required to install the following node.js modules in order to start the servers:
 + [nedb](https://github.com/louischatriot/nedb/), required by /module/db.js
++ [node-static](https://github.com/cloudhead/node-static), required by /index.js
++ [node-uuid](https://github.com/broofa/node-uuid), required by /module/jsso-server.js
 + [ws](https://github.com/einaros/ws), required by /module/jsso-server.js
 You can install them by using npm in console:
 ```Shell
@@ -156,7 +156,7 @@ You can install them by using npm in console:
 
 ## installation
 1. install the latest version of [node.js](http://nodejs.org/) (v0.1017+)
-2. install all the required modules (see the perious section)
+2. install all the required modules (see the previous section)
 3. download the source code of this repository by clicking the "Download ZIP" button at the right of the page
 ![alt text](https://raw.github.com/dogdoglization/node-jsso-server/master/readme_resource/how_to_download.png "How to download GitHub repository")
 4. extract the zip file, there should be an "index.js" file in the root folder

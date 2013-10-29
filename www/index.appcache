@@ -41,5 +41,5 @@ CACHE MANIFEST
 /js/respond.min.js
 /js/angular.min.js
 /css/index.css
-/cloud.js
+/JSSO.js
 /index.html
