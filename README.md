@@ -149,14 +149,18 @@ You are required to install the following node.js modules in order to start the 
 + [node-uuid](https://github.com/broofa/node-uuid), required by /module/jsso-server.js
 + [nedb](https://github.com/louischatriot/nedb/), required by /module/db.js
 + [ws](https://github.com/einaros/ws), required by /module/jsso-server.js
+You can install them by using npm in console:
+```Shell
+> npm install <dependency>
+```
 
 ## installation
-1. install the last version of [node.js](http://nodejs.org/)
+1. install the latest version of [node.js](http://nodejs.org/) (v0.1017+)
 2. install all the required modules (see the perious section)
 3. download the source code of this repository by clicking the "Download ZIP" button at the right of the page
 ![alt text](https://raw.github.com/dogdoglization/node-jsso-server/master/readme_resource/how_to_download.png "How to download GitHub repository")
 4. extract the zip file, there should be an "index.js" file in the root folder
-5. open the system console, change to the root directory, and then start the server by entering "node index.js", like this:
+5. open the system console, move to the root directory, and then start the server by entering "node index.js", like this:
 ```Shell
 C:\Users\YourAccount> cd The\Directory\Of\TheExtracted\Folder
 The\Directory\Of\TheExtracted\Folder> node index.js
