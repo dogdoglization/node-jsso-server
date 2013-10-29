@@ -152,7 +152,7 @@ You are required to install the following node.js modules in order to start the 
 
 You can install them by using npm in console:
 ```Shell
-> npm install <dependency>
+$ npm install <dependency>
 ```
 
 ## installation
@@ -163,8 +163,8 @@ You can install them by using npm in console:
 4. extract the zip file, there should be an "index.js" file in the root folder
 5. open the system console, move to the root directory, and then start the server by entering "node index.js", like this:
 ```Shell
-C:\Users\YourAccount> cd The\Directory\Of\TheExtracted\Folder
-The\Directory\Of\TheExtracted\Folder> node index.js
+$ C:\Users\YourAccount> cd The\Directory\Of\TheExtracted\Folder
+$ The\Directory\Of\TheExtracted\Folder> node index.js
 ```
 6. now the JSSO server instance listen on port 8080, and a http server instance listen on port 80
 > you can change the ports by modify the code in index.js if any problems about the use of port number on your computer.
