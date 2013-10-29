@@ -162,7 +162,6 @@ $ npm install <dependency>
 ![alt text](https://raw.github.com/dogdoglization/node-jsso-server/master/readme_resource/how_to_download.png "How to download GitHub repository")
 4. extract the zip file, there should be an "index.js" file in the root folder
 5. open the system console, move to the root directory, and then start the server by entering "node index.js", like this:
-
 ```Shell
 $ C:\Users\YourAccount> cd The\Directory\Of\TheExtracted\Folder
 $ The\Directory\Of\TheExtracted\Folder> node index.js
