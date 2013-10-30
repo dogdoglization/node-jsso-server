@@ -20,7 +20,7 @@ A JSSO should be like this:
 	functionName2: function() { ...
 }
 ```
-and should save JSSOs with a unique ID/name for each - just like saving all files under the same folder.
+and saving it with a unique ID/name - just like saving all files under the same folder.
 You may have your JSSOs as many as you like, and naming them whatever you want.
 
 
@@ -36,9 +36,11 @@ Writing JSSO is really easy. For example, naming the following object with ID "m
 Instead of using JSON-like style, you can, but not recommend, contruct JSSO in a function call:
 ```JavaScript
 (function() {
-	//construct JSSO here
 	var jsso = new Object();
-	...... //complex operations on jsso here
+	jsso.hello = function(name) {
+		if (!name) throw new Error("name missing.");
+		return "Hello " + name + "!";
+	};
 	return jsso;
 })()
 ```
@@ -157,6 +159,7 @@ Configuration can be placed inside the JSSO.js script tag for convenience, but d
 ```
 >The changed setting will only be applied to the upcoming "new JSSO(...)" constructions. 
 >It means that the previous stubs still use the old setting.
+
 You can also change the server info each time when construct a stub:
 ```JavaScript
 var jsso1 = new JSSO("the.jsso.id", {host: "localhost", port: 8080});//apply other host and port
