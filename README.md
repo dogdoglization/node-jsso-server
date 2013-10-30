@@ -188,20 +188,25 @@ var jsso3 = new JSSO("the.jsso.id", {port: 8080});//apply other port only, host 
 2. download the source code of this repository by clicking the "Download ZIP" button at the right of the page
 ![alt text](https://raw.github.com/dogdoglization/node-jsso-server/master/readme_resource/how_to_download.png "How to download GitHub repository")
 3. extract the zip file, there should be an "index.js" file in the root folder
-4. install all the required modules by command (npm will read package.json for details):
+4.  open a console and move to the root directory:
+```Shell
+$ C:\Users\YourAccount> cd The\Directory\Of\TheExtracted\Folder
+```
+
+5. install all the required modules by command (npm will read package.json for details):
 ```Shell
 $ npm install -l
 ```
 
-5. open the system console, move to the root directory, and then start the server by entering "node index.js", like this:
+6. then start the server by entering "node index.js", like this:
 ```Shell
 $ C:\Users\YourAccount> cd The\Directory\Of\TheExtracted\Folder
 $ The\Directory\Of\TheExtracted\Folder> node index.js
 ```
 
-6. now the JSSO server instance listen on port 8080, and a http server instance listen on port 80
+7. now the JSSO server instance listen on port 8080, and a http server instance listen on port 80
 > you can change the ports by modify the code in index.js if any problems about the use of port number on your computer.
-7. open a web browser and go to http://localhost/, it is the place for you to control all JSSOs which are found in database.
+8. open a web browser and go to http://localhost/, it is the place for you to control all JSSOs which are found in database.
 > do remember that **Do Not Make Any Change Of "admin.db" JSSO** because you need it to access the database, else this web page will be functionless and you will probably get into trouble.
 
 
