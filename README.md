@@ -190,17 +190,16 @@ var jsso3 = new JSSO("the.jsso.id", {port: 8080});//apply other port only, host 
 3. extract the zip file, there should be an "index.js" file in the root folder
 4.  open a console and move to the root directory:
 ```Shell
-$ C:\Users\YourAccount> cd The\Directory\Of\TheExtracted\Folder
+$ some\where> cd The\Directory\Of\TheExtracted\Folder
 ```
 
 5. install all the required modules by command (npm will read package.json for details):
 ```Shell
-$ npm install -l
+$ The\Directory\Of\TheExtracted\Folder> npm install -l
 ```
 
 6. then start the server by entering "node index.js", like this:
 ```Shell
-$ C:\Users\YourAccount> cd The\Directory\Of\TheExtracted\Folder
 $ The\Directory\Of\TheExtracted\Folder> node index.js
 ```
 
