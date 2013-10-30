@@ -9,9 +9,11 @@ node-jsso-server services JavaScript objects (stored in internal database) to th
 Each of these objects in the server is called JSSO(JavaScript Service Object). In fact they are no different between normal JavaScript objects.
 All these objects would be maintained by the JSSO server. you need JSSO.js script file to access these JSSOs.
 ![alt text](https://raw.github.com/dogdoglization/node-jsso-server/master/readme_resource/architecture_on_web.png "Web view of JSSO server")
+
 JSSO.js provides a stub constructor in which each stub is response to different JSSO on the server.
 It would maintains a WebSocket connection for each server; all stub-JSSO links to a server are placed upon this connection.
 ![alt text](https://raw.github.com/dogdoglization/node-jsso-server/master/readme_resource/how_it_work.png "code view of JSSO usage")
+
 You can not only use JSSOs remotely, but also refer and make calls from other JSSOs in the same server.
 
 
@@ -184,7 +186,11 @@ var jsso3 = new JSSO("the.jsso.id", {port: 8080});//apply other port only, host 
 2. download the source code of this repository by clicking the "Download ZIP" button at the right of the page
 ![alt text](https://raw.github.com/dogdoglization/node-jsso-server/master/readme_resource/how_to_download.png "How to download GitHub repository")
 3. extract the zip file, there should be an "index.js" file in the root folder
-4. install all the required modules (see the Dependencies section)
+4. install all the required modules by command (npm will read package.json for details):
+```Shell
+$ npm install -l
+```
+
 5. open the system console, move to the root directory, and then start the server by entering "node index.js", like this:
 ```Shell
 $ C:\Users\YourAccount> cd The\Directory\Of\TheExtracted\Folder
@@ -198,10 +204,6 @@ $ The\Directory\Of\TheExtracted\Folder> node index.js
 
 
 ## Dependencies
-You can install all the modules in one command using npm in console (move to the root folder of the repository first):
-```Shell
-$ npm install -l
-```
 The following modules are required in order to start the servers:
 + [nedb](https://github.com/louischatriot/nedb/), required by /module/db.js
 + [node-static](https://github.com/cloudhead/node-static), required by /index.js
