@@ -3,14 +3,14 @@
 node-jsso-server is aimed for providing a easy approach of app server/client programming, running upon node.js. 
 It treats each of different groups of server functions as a JavaScript object and represent it as a object-like stub in your HTML5 script.
 
-## Concept
+## Concept & Usage
 node-jsso-server services JavaScript objects (stored in internal database) to the HTML5 apps/websites over websocket connection. 
 Each of these objects in the server is called JSSO(JavaScript Service Object). In fact they are no different than normal JavaScript objects.
 All these objects would be maintained by the JSSO server; you can access them remotely through using the "JSSO" constructor which is defined in JSSO.js script file.
 ![alt text](https://raw.github.com/dogdoglization/node-jsso-server/master/readme_resource/architecture_on_web.png "Web view of JSSO server")
 
-### Server Side
-You should write your JSSOs like this:
+### Define JSSO
+A JSSO should be like this:
 ```JavaScript
 {
 	functionName: function(parameter1, parameter2, ...) {
@@ -20,7 +20,7 @@ You should write your JSSOs like this:
 	functionName2: function() { ...
 }
 ```
-and save each JSSO with a unique ID/name - just like saving all files under the same folder.
+and should save JSSOs with a unique ID/name for each - just like saving all files under the same folder.
 You may have your JSSOs as many as you like, and naming them whatever you want.
 
 
@@ -33,22 +33,33 @@ Writing JSSO is really easy. For example, naming the following object with ID "m
 	}
 } //End of my.test
 ```
+Instead of using JSON-like style, you can, but not recommend, contruct JSSO in a function call:
+```JavaScript
+(function() {
+	//construct JSSO here
+	var jsso = new Object();
+	...... //complex operations on jsso here
+	return jsso;
+})()
+```
+notice that it is a anonymous function call, but not a function declaration.
 
-### Client Side
-Please include "JSSO.js" before use, it is placed at "/www/JSSO.js" of the repository: 
+### Use JSSO
+Please includes "JSSO.js" in HTML5 before use. It is placed at "/www/JSSO.js" of the repository: 
 ```HTML
 <script src="JSSO.js"></script>
 ```
 The script will declares a global variable "JSSO", which is used to generate stubs of JSSOs.
 A Stub is used to access corresponding JSSO functions on server.
-For example, You can get a stub of JSSO "my.test" like this:
+For example, getting a stub of JSSO "my.test" like this:
 ```JavaScript
 var jsso = new JSSO("my.test");
 ```
 In the background, JSSO.js would try building a WebSocket connection to the server asynchronously:
 ![alt text](https://raw.github.com/dogdoglization/node-jsso-server/master/readme_resource/how_to_get_stub.png "How to get a JSSO stub")
 
-You now can make the function call and handle the data returned using a callback:
+#### Invoke Function
+we now can make the function call and handle the data returned using a callback:
 ```JavaScript
 //pass parameter as the 2nd argument
 jsso.invoke("hello", "World", function(data) {
@@ -69,16 +80,16 @@ Even it looks ugly, a callback function is required because it is a non-blocking
 ![alt text](https://raw.github.com/dogdoglization/node-jsso-server/master/readme_resource/how_to_invoke.png "How to invoke function")
 Any errors from JSSOs will be extracted at JSSO server and rebuild at JSSO.js seamlessly. You can providing a error handler to handle this task.
 ```JavaScript
-//you can handle error from the JSSO call with additional error handler
+//you can handle error from JSSO call with an error handler
 jsso.invoke("hello", function(data) {//data handler, required
 	//handle returned data
 }, function(error) {// error handler, optional
-	//you would get error = Error("name missing.") here, 
-	//throwed by the JSSO function,
-	//because name is required as the parameter
+	//we would get error = Error("name missing.") here
+	//because name is required as the parameter of the function
 });
 ```
 
+### Broadcast Message
 You can also broadcast messages using similar approach:
 ```JavaScript
 jsso.broadcast("notice", "It's a test!");
@@ -109,27 +120,49 @@ jsso.on("hello", function(data) {
 ![alt text](https://raw.github.com/dogdoglization/node-jsso-server/master/readme_resource/how_to_broadcast.png "How to broadcast message")
 Optionally, you can handle any error occurred during message proccessing, in which a error handler is required:
 ```JavaScript
-jsso.broadcast("hello", "something", function(error) {
+jsso.broadcast("hello", "something", function(error) {//error handler, optional
 	//handle error here
 });
 ```
 
-## API
-TO BE CONSTRUCT...
-### Configuration
-
-### Usage - JSSO.js
+## Configuration
+You may need configuring JSSO setting before use, say, adjust the host and port number:
 ```JavaScript
-service.invoke("functionName", //the function name of the JSSO, required
-	["optional", "parameters"], //parameters passed to function, in array form, optional
-	function onSuccess(dataReceived) { //callback, required
-		...
-	}, 
-	function onError(anyError) {//error handler, optional
-		...
-	});
+JSSO.setting.server.host = "your domain";
+JSSO.setting.server.port = 8080; //the port number of the JSSO server, not HTTP server
 ```
-
+All values of JSSO.setting attributes can be changed, which is an object as following:
+```JavaScript
+/* default setting */
+JSSO.setting = {
+	server: { // Server Location Setting
+		"host": "localhost",
+		"port": 8080
+	},
+	MaximumCallsWaiting: Number.MAX_VALUE, //max. number of calls in waiting
+	FunctionInvokingTimeout: 30000, //timeout for each invoke(), 30 seconds by default
+	MessageListeningTimeout: 3153600000000, //timeout for each on(), 100 years by default
+	ConnectionRebuildInterval: 5000, //retry building websocket connection if closed, 5 seconds by default
+	TimesOfConnectionRebuild: 12 //max. number of retry building connection, 12 times by default
+};
+```
+Configuration can be placed inside the JSSO.js script tag for convenience, but do remember that the src's path must ends with "JSSO.js":
+```HTML
+<script src="./JSSO.js">
+	JSSO.setting.server = {
+		host: "your domain",
+		port: 8080
+	}
+</script>
+```
+>The changed setting will only be applied to the upcoming "new JSSO(...)" constructions. 
+>It means that the previous stubs still use the old setting.
+You can also change the server info each time when construct a stub:
+```JavaScript
+var jsso1 = new JSSO("the.jsso.id", {host: "localhost", port: 8080});//apply other host and port
+var jsso2 = new JSSO("the.jsso.id", {host: "localhost"});//apply new host only, port remained the same
+var jsso3 = new JSSO("the.jsso.id", {port: 8080});//apply other port only, host remained the same
+```
 
 ## Dependencies
 You are required to install the following node.js modules in order to start the servers:
