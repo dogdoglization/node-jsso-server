@@ -8,10 +8,12 @@ It treats each of different groups of server functions as a JavaScript object an
 node-jsso-server services JavaScript objects (stored in internal database) to the HTML5 apps/websites over websocket connection. 
 Each of these objects in the server is called JSSO(JavaScript Service Object). In fact they are no different between normal JavaScript objects.
 All these objects would be maintained by the JSSO server. you need JSSO.js script file to access these JSSOs.
+
 ![alt text](https://raw.github.com/dogdoglization/node-jsso-server/master/readme_resource/architecture_on_web.png "Web view of JSSO server")
 
 JSSO.js provides a stub constructor in which each stub is response to different JSSO on the server.
 It would maintains a WebSocket connection for each server; all stub-JSSO links to a server are placed upon this connection.
+
 ![alt text](https://raw.github.com/dogdoglization/node-jsso-server/master/readme_resource/how_it_work.png "code view of JSSO usage")
 
 You can not only use JSSOs remotely, but also refer and make calls from other JSSOs in the same server.
