@@ -155,6 +155,7 @@ Indicate a script execution problem found in JSSO.
 Indicate a remote call timeout. 
 It may be a JSSO function running timeout on server, or a data handler at client side is expired and removed.
 > the function running period is never limited, so it always the latter case.
+
 ##### JSSO.ObjectNotFoundError
 Indicate a required JSSO is not found at the server side.
 ##### JSSO.FunctionNotFoundError
@@ -164,7 +165,7 @@ Indicate a required function is not found in the JSSO.
 #### Stub Error handler
 Sometime we need handle exceptions that cannot controlled by the error handlers passed in function calls.
 For example, JSSO.ConnectionError and JSSO.TimeoutError which may occur anytime.
-As the result there is a stub error handler for each stub:
+As the result there is a error handler for each stub:
 ```JavaScript
 var jsso = new JSSO("some.id");
 jsso.onError = function(error) { //custom your stub error handler here
