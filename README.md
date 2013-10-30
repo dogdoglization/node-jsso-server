@@ -22,10 +22,13 @@ You should write your JSSOs like this:
 ```
 and save each JSSO with a unique ID/name - just like saving all files under the same folder.
 You may have your JSSOs as many as you like, and naming them whatever you want.
+
+
 Writing JSSO is really easy. For example, naming the following object with ID "my.test":
 ```JavaScript
-{ //Defination of my.test JSSO
+{ //Defination of my.test
 	hello: function(name) {
+		if (!name) throw new Error("name missing.");
 		return "Hello " + name + "!";
 	}
 } //End of my.test
@@ -47,20 +50,34 @@ In the background, JSSO.js would try building a WebSocket connection to the serv
 
 You now can make the function call and handle the data returned using a callback:
 ```JavaScript
-jsso.invoke("hello", "World", function(data) {//here is a syntax sugar
+//pass parameter as the 2nd argument
+jsso.invoke("hello", "World", function(data) {
 	alert(data);
 });
+//the above is a syntax sugar
 //formally, parameters should wrap in a array
-jsso.invoke("hello", ["World"], function(data) {
+jsso.invoke("hello", ["World", "Web", "others"], function(data) {
 	alert(data);
 });
-//for two or more parameters, it is good for reading
-jsso.invoke("hello", ["World", "Web"], function(data) {
+//if no parameter provided, simply skip it
+jsso.invoke("hello", function(data) {
 	alert(data);
 });
+
 ```
 Even it looks ugly, a callback function is required because it is a non-blocking asynchronous call internally:
 ![alt text](https://raw.github.com/dogdoglization/node-jsso-server/master/readme_resource/how_to_invoke.png "How to invoke function")
+Any errors from JSSOs will be extracted at JSSO server and rebuild at JSSO.js seamlessly. You can providing a error handler to handle this task.
+```JavaScript
+//you can handle error from the JSSO call with additional error handler
+jsso.invoke("hello", function(data) {//data handler, required
+	//handle returned data
+}, function(error) {// error handler, optional
+	//you would get error = Error("name missing.") here, 
+	//throwed by the JSSO function,
+	//because name is required as the parameter
+});
+```
 
 You can also broadcast messages using similar approach:
 ```JavaScript
