@@ -410,7 +410,7 @@ License: MIT
 		"TimesOfConnectionRebuild": 12 //max. number of connection rebuild while failed, 12 times by default
 	};
 	
-	/* user-bindable handler for receiving any macro errors that cannot processed with function invocation callbacks */
+	/* stub error handler for receiving any errors that cannot handle by function's error handler */
 	JSSO.onError = function(error) {
 		console.log(error.stack);
 	};

@@ -16,7 +16,7 @@ It would maintains a WebSocket connection for each server; all stub-JSSO links t
 
 ![alt text](https://raw.github.com/dogdoglization/node-jsso-server/master/readme_resource/how_it_work.png "code view of JSSO usage")
 
-You can not only use JSSOs remotely, but also refer and make calls from other JSSOs in the same server.
+You not only can use JSSOs remotely, but also refer and make calls from other JSSOs under the same server.
 
 
 ##Usage
@@ -141,6 +141,36 @@ jsso.broadcast("hello", "something", function(error) {//error handler, optional
 });
 ```
 
+
+### handle Errors
+#### Types of Errors
+In addition to the JavaScript default error types, there are 6 more errors defined in JSSO constructor:
+##### JSSO.ConnectionError
+Indicate a problem occurs on the WebSocket connection.
+##### JSSO.ServerError
+Indicate a error throwed from the server side.
+##### JSSO.ScriptError
+Indicate a script execution problem found in JSSO.
+##### JSSO.TimeoutError
+Indicate a remote call timeout. 
+It may be a JSSO function running timeout on server, or a data handler at client side is expired and removed.
+> the function running period is never limited, so it always the latter case.
+##### JSSO.ObjectNotFoundError
+Indicate a required JSSO is not found at the server side.
+##### JSSO.FunctionNotFoundError
+Indicate a required function is not found in the JSSO.
+
+
+#### Stub Error handler
+Sometime we need handle exceptions that cannot controlled by the error handlers passed in function calls.
+For example, JSSO.ConnectionError and JSSO.TimeoutError which may occur anytime.
+As the result there is a stub error handler for each stub:
+```JavaScript
+var jsso = new JSSO("some.id");
+jsso.onError = function(error) { //custom your stub error handler here
+	console.log(error.stack); //the default behaviour is to print out the stack
+};
+```
 
 ## Configuration
 You may need configuring JSSO setting before use, say, adjust the host and port number:
