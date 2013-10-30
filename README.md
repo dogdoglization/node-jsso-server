@@ -3,12 +3,18 @@
 node-jsso-server is aimed for providing a easy approach of app server/client programming, running upon node.js. 
 It treats each of different groups of server functions as a JavaScript object and represent it as a object-like stub in your HTML5 script.
 
-## Concept & Usage
-node-jsso-server services JavaScript objects (stored in internal database) to the HTML5 apps/websites over websocket connection. 
-Each of these objects in the server is called JSSO(JavaScript Service Object). In fact they are no different than normal JavaScript objects.
-All these objects would be maintained by the JSSO server; you can access them remotely through using the "JSSO" constructor which is defined in JSSO.js script file.
-![alt text](https://raw.github.com/dogdoglization/node-jsso-server/master/readme_resource/architecture_on_web.png "Web view of JSSO server")
 
+## Concept
+node-jsso-server services JavaScript objects (stored in internal database) to the HTML5 apps/websites over websocket connection. 
+Each of these objects in the server is called JSSO(JavaScript Service Object). In fact they are no different between normal JavaScript objects.
+All these objects would be maintained by the JSSO server. you need JSSO.js script file to access these JSSOs.
+![alt text](https://raw.github.com/dogdoglization/node-jsso-server/master/readme_resource/architecture_on_web.png "Web view of JSSO server")
+JSSO.js provides a stub constructor in which each stub is response to different JSSO on the server.
+It would maintains a WebSocket connection for each server; all stub-JSSO links to a server are placed upon this connection.
+![alt text](https://raw.github.com/dogdoglization/node-jsso-server/master/readme_resource/hot_it_work.png "code view of JSSO usage")
+You can not only use JSSOs remotely, but also refer and make calls from other JSSOs in the same server.
+
+##Usage
 ### Define JSSO
 A JSSO should be like this:
 ```JavaScript
@@ -46,6 +52,7 @@ Instead of using JSON-like style, you can, but not recommend, contruct JSSO in a
 ```
 notice that it is a anonymous function call, but not a function declaration.
 
+
 ### Use JSSO
 Please includes "JSSO.js" in HTML5 before use. It is placed at "/www/JSSO.js" of the repository: 
 ```HTML
@@ -59,6 +66,7 @@ var jsso = new JSSO("my.test");
 ```
 In the background, JSSO.js would try building a WebSocket connection to the server asynchronously:
 ![alt text](https://raw.github.com/dogdoglization/node-jsso-server/master/readme_resource/how_to_get_stub.png "How to get a JSSO stub")
+
 
 #### Invoke Function
 we now can make the function call and handle the data returned using a callback:
@@ -91,7 +99,8 @@ jsso.invoke("hello", function(data) {//data handler, required
 });
 ```
 
-### Broadcast Message
+
+#### Broadcast Message
 You can also broadcast messages using similar approach:
 ```JavaScript
 jsso.broadcast("notice", "It's a test!");
@@ -126,6 +135,7 @@ jsso.broadcast("hello", "something", function(error) {//error handler, optional
 	//handle error here
 });
 ```
+
 
 ## Configuration
 You may need configuring JSSO setting before use, say, adjust the host and port number:
@@ -167,24 +177,13 @@ var jsso2 = new JSSO("the.jsso.id", {host: "localhost"});//apply new host only, 
 var jsso3 = new JSSO("the.jsso.id", {port: 8080});//apply other port only, host remained the same
 ```
 
-## Dependencies
-You are required to install the following node.js modules in order to start the servers:
-+ [nedb](https://github.com/louischatriot/nedb/), required by /module/db.js
-+ [node-static](https://github.com/cloudhead/node-static), required by /index.js
-+ [node-uuid](https://github.com/broofa/node-uuid), required by /module/jsso-server.js
-+ [ws](https://github.com/einaros/ws), required by /module/jsso-server.js
-
-You can install them by using npm in console:
-```Shell
-$ npm install <dependency>
-```
 
 ## installation
 1. install the latest version of [node.js](http://nodejs.org/) (v0.1017+)
-2. install all the required modules (see the previous section)
-3. download the source code of this repository by clicking the "Download ZIP" button at the right of the page
+2. download the source code of this repository by clicking the "Download ZIP" button at the right of the page
 ![alt text](https://raw.github.com/dogdoglization/node-jsso-server/master/readme_resource/how_to_download.png "How to download GitHub repository")
-4. extract the zip file, there should be an "index.js" file in the root folder
+3. extract the zip file, there should be an "index.js" file in the root folder
+4. install all the required modules (see the Dependencies section)
 5. open the system console, move to the root directory, and then start the server by entering "node index.js", like this:
 ```Shell
 $ C:\Users\YourAccount> cd The\Directory\Of\TheExtracted\Folder
@@ -195,6 +194,21 @@ $ The\Directory\Of\TheExtracted\Folder> node index.js
 > you can change the ports by modify the code in index.js if any problems about the use of port number on your computer.
 7. open a web browser and go to http://localhost/, it is the place for you to control all JSSOs which are found in database.
 > do remember that **Do Not Make Any Change Of "admin.db" JSSO** because you need it to access the database, else this web page will be functionless and you will probably get into trouble.
+
+
+## Dependencies
+You can install all the modules in one command using npm in console (move to the root folder of the repository first):
+```Shell
+$ npm install -l
+```
+The following modules are required in order to start the servers:
++ [nedb](https://github.com/louischatriot/nedb/), required by /module/db.js
++ [node-static](https://github.com/cloudhead/node-static), required by /index.js
++ [node-uuid](https://github.com/broofa/node-uuid), required by /module/jsso-server.js
++ [ws](https://github.com/einaros/ws), required by /module/jsso-server.js
+
+
+
 
 ## Licence
 The MIT Licence (MIT) [http://opensource.org/licenses/mit-license.php](http://opensource.org/licenses/mit-license.php)
