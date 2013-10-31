@@ -20,8 +20,6 @@ You not only can use JSSOs remotely, but also refer and make calls from other JS
 
 Besides, JSSO.js would maintain WebSocket connections of different servers automatically. 
 Each time a remote call is made but the server is disconnected, it will try building/rebuilding the WebSocket and then flush all the calls remained at client. 
-Connection would be built only when either invoke(), broadcast(), on(), or off() calls made. 
-Getting stubs using JSSO constructor would not trigger this action.
 
 
 ##Usage
