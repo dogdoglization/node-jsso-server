@@ -79,7 +79,8 @@ License: MIT
 		
 		// on websocket open event handler
 		onWsOpen = _emptyFunction;
-		//on websocket message event handler
+		//on websocket message event handler:
+		//handle data received from server and invoke corresponding user callback
 		onWsMsg = function(event) {
 			var result, callback, func;
 			try {
@@ -124,6 +125,7 @@ License: MIT
 				//get corresponding callback function, either success or error
 				func = result.err? callback.error : callback.success;
 				
+				//match the right data type and make function call
 				switch (result.type) {
 					case 'undefined':
 						func();
@@ -171,18 +173,19 @@ License: MIT
 		};
 		//on websocket error event handler
 		onWsErr = function(event) {
-			if (ws.readyState === 3) //the connection has been closed or could not be opened
-				rebuildConnection();
+			JSSO.onError(new JSSO.ConnectionError("WebSocket Error: " + ws.readyState)); //throw exception to user
 		};
 		
-		rebuildConnection = function() { //rebuild the connection while unavailable
+		//auto rebuild the websockert connection
+		rebuildConnection = function() {
+			if (ws.readyState === WebSocket.OPEN || ws.readyState === WebSocket.CONNECTING)
+				return;
 			ws.close();
-			var times = JSSO.setting.TimesOfConnectionRebuild;
 			var rebuild = function() {
-				console.log("connection <" + wsUrl +"> rebuilding... " + --times + " times left");
+				console.log("connection <" + wsUrl +"> rebuilding... ");
 				ws = new WebSocket(wsUrl);
 				//set websocket handler
-				ws.onopen = (function(callStack, serverRequiresOfSettingListener) {
+				ws.onopen = (function(callStack, serverRequiresOfSettingListener, flush) {
 					return function() {
 						console.log("connection rebuilt");
 						//put all on() requires into callStack for re-register event listener at server side
@@ -193,15 +196,10 @@ License: MIT
 						//flush all calls in callStack
 						flush();
 					};
-				})(callStack, serverRequiresOfSettingListener);
-				ws.onmessage = onWsMsg;
-				ws.onerror = onWsErr;
+				})(callStack, serverRequiresOfSettingListener, flush);
 				setTimeout(function() {
-					if (ws.readyState !== 1) {//not established
-						if (times > 0) //retry
-							rebuild();
-						else //rebuild process failed
-							JSSO.onError(new JSSO.ConnectionError()); //throw exception to user
+					if (ws.readyState !== WebSocket.OPEN) {//not established
+							rebuild(); //retry
 					}
 				}, JSSO.setting.ConnectionRebuildInterval);
 				
@@ -213,18 +211,18 @@ License: MIT
 		//function to handle calls sending
 		flush = function() {
 			switch (ws.readyState) {
-				case 0: //not yet been established
+				case WebSocket.CONNECTING: //not yet been established
 					ws.onopen = function() {
 						flush();
 					};
 					break;
-				case 1: //established and communicable
+				case WebSocket.OPEN: //established and communicable
 					//send all calls in buffer
 					while (callStack.length > 0)
 						ws.send(JSON.stringify(callStack.shift()));
 					break;
-				case 2: //in closing
-				case 3: //closed or cannot be opened
+				case WebSocket.CLOSING: //in closing
+				case WebSocket.CLOSED: //closed or cannot be opened
 				default:
 					rebuildConnection();
 			}
@@ -406,8 +404,7 @@ License: MIT
 		"MaximumCallsWaiting": Number.MAX_VALUE, //max. number of calls to wait
 		"FunctionInvokingTimeout": 30000, //timeout for each invoke(), 30s by default
 		"MessageListeningTimeout": 3153600000000, //timeout for each on(), 100yrs by default
-		"ConnectionRebuildInterval": 5000, //retry building websocket connection if closed, 5s by default
-		"TimesOfConnectionRebuild": 12 //max. number of connection rebuild while failed, 12 times by default
+		"ConnectionRebuildInterval": 10000, //retry building websocket connection if closed, 10s by default
 	};
 	
 	/* stub error handler for receiving any errors that cannot handle by function's error handler */

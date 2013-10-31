@@ -12,11 +12,16 @@ All these objects would be maintained by the JSSO server. you need JSSO.js scrip
 ![alt text](https://raw.github.com/dogdoglization/node-jsso-server/master/readme_resource/architecture_on_web.png "Web view of JSSO server")
 
 JSSO.js provides a stub constructor in which each stub is response to different JSSO on the server.
-It would maintains a WebSocket connection for each server; all stub-JSSO links to a server are placed upon this connection.
+It would maintains a WebSocket connection for each server; all stub-JSSO links to the server are placed upon this connection.
 
 ![alt text](https://raw.github.com/dogdoglization/node-jsso-server/master/readme_resource/how_it_work.png "code view of JSSO usage")
 
-You not only can use JSSOs remotely, but also refer and make calls from other JSSOs under the same server.
+You not only can use JSSOs remotely, but also refer and make calls from other JSSOs under the same server, with the same usage methods.
+
+Besides, JSSO.js would maintain WebSocket connections of different servers automatically. 
+Each time a remote call is made but the server is disconnected, it will try building/rebuilding the WebSocket and then flush all the calls remained at client. 
+Connection would be built only when either invoke(), broadcast(), on(), or off() calls made. 
+Getting stubs using JSSO constructor would not trigger this action.
 
 
 ##Usage
@@ -154,7 +159,7 @@ Indicate a script execution problem found in JSSO.
 ##### JSSO.TimeoutError
 Indicate a remote call timeout. 
 It may be a JSSO function running timeout on server, or a data handler at client side is expired and removed.
-> the function running period is never limited, so it always the latter case.
+> the function running period is never limited, so it always be the latter case.
 
 ##### JSSO.ObjectNotFoundError
 Indicate a required JSSO is not found at the server side.
@@ -190,8 +195,7 @@ JSSO.setting = {
 	MaximumCallsWaiting: Number.MAX_VALUE, //max. number of calls in waiting
 	FunctionInvokingTimeout: 30000, //timeout for each invoke(), 30 seconds by default
 	MessageListeningTimeout: 3153600000000, //timeout for each on(), 100 years by default
-	ConnectionRebuildInterval: 5000, //retry building websocket connection if closed, 5 seconds by default
-	TimesOfConnectionRebuild: 12 //max. number of retry building connection, 12 times by default
+	ConnectionRebuildInterval: 10000, //retry building websocket connection if closed, 10 seconds by default
 };
 ```
 Configuration can be placed inside the JSSO.js script tag for convenience, but do remember that the src's path must ends with "JSSO.js":
