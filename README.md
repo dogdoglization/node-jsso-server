@@ -19,7 +19,7 @@ It would maintains a WebSocket connection for each server; all stub-JSSO links t
 You not only can use JSSOs remotely, but also refer and make calls from other JSSOs under the same server, with the same usage methods.
 
 Besides, JSSO.js would maintain WebSocket connections of different servers automatically. 
-Each time a remote call is made but the server is disconnected, it will try building/rebuilding the WebSocket and then flush all the calls remained at client. 
+Each time a remote call is made but the server is disconnected, it will try rebuilding the WebSocket and then flush all the calls remained at client. 
 
 
 ##Usage
@@ -77,34 +77,69 @@ In the background, JSSO.js would try building a WebSocket connection to the serv
 
 
 #### Invoke Function
+To make invocation, you need specifing at least the function name and a callback for receiving the returned data.
+Callback function is required because it is internally a non-blocking asynchronous call:
+![alt text](https://raw.github.com/dogdoglization/node-jsso-server/master/readme_resource/how_to_invoke.png "How to invoke function")
+However, parameters and error handler are optional for the call.
+##### .invoke(functionName:string, parameter:Object, callback:function)
 we now can make the function call and handle the data returned using a callback:
 ```JavaScript
-//pass parameter as the 2nd argument
+//pass the parameter as the 2nd argument
 jsso.invoke("hello", "World", function(data) {
 	alert(data);
 });
-//the above is a syntax sugar
-//formally, parameters should wrap in a array
+
+//the server function call would be like this:
+//jsso.hello("World");
+```
+The above is a syntax sugar: directly pass the parameter only if there is one argument for the function.
+##### .invoke(functionName:string, parameters:Array, callback:function)
+Formally, parameters should wrap in an array like this:
+```JavaScript
 jsso.invoke("hello", ["World", "Web", "others"], function(data) {
 	alert(data);
 });
-//if no parameter provided, simply skip it
-jsso.invoke("hello", function(data) {
+
+//the server function call would be like this:
+//jsso.hello("World", "Web", "others");
+```
+
+If there is a function accept only an array as its argument, wrapping must be performed:
+```JavaScript
+jsso.invoke("hello", [["your", "array", "elements"]], function(data) {
 	alert(data);
 });
 
+//the server function call would be like this:
+//jsso.hello(["your", "array", "elements"]);
 ```
-Even it looks ugly, a callback function is required because it is a non-blocking asynchronous call internally:
-![alt text](https://raw.github.com/dogdoglization/node-jsso-server/master/readme_resource/how_to_invoke.png "How to invoke function")
-Any errors from JSSOs will be extracted at JSSO server and rebuild at JSSO.js seamlessly. You can providing a error handler to handle this task.
+##### .invoke(functionName:string, callback:function)
+If no parameter is required, simply skip it and pass the callback as the 2nd parameter:
 ```JavaScript
-//you can handle error from JSSO call with an error handler
-jsso.invoke("hello", function(data) {//data handler, required
-	//handle returned data
-}, function(error) {// error handler, optional
-	//we would get error = Error("name missing.") here
-	//because name is required as the parameter of the function
+jsso.invoke("hello", function(data) {
+	alert(data);
 });
+```
+##### .invoke(functionName:string[, parameter:Object], onSuccess:function[, onError:function])
+Any errors found during invoking will be extracted by JSSO server and rebuilt at JSSO.js seamlessly. 
+You can append a optional error handler in the call:
+```JavaScript
+jsso.invoke("hello", 
+	function(data) {alert(data);}, 
+	function(error) {console.log(error);}
+);
+jsso.invoke("hello", "World", 
+	function(data) {alert(data);}, 
+	function(error) {console.log(error);}
+);
+jsso.invoke("hello", ["World", "Web", "others"], 
+	function(data) {alert(data);}, 
+	function(error) {console.log(error);}
+);
+jsso.invoke("hello", [["your", "array", "elements"]], 
+	function(data) {alert(data);}, 
+	function(error) {console.log(error);}
+);
 ```
 
 
