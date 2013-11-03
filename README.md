@@ -16,14 +16,14 @@ It would maintains a WebSocket connection for each server; all stub-JSSO links t
 
 ![alt text](https://raw.github.com/dogdoglization/node-jsso-server/master/readme_resource/how_it_work.png "code view of JSSO usage")
 
-You not only can use JSSOs remotely, but also refer and make calls from other JSSOs under the same server, with the same usage methods.
+You not only can use JSSOs remotely, but also refer and make calls from other JSSOs under the same server, using the same approach and API calls.
 
 Besides, JSSO.js would maintain WebSocket connections of different servers automatically. 
 Each time a remote call is made but the server is disconnected, it will try rebuilding the WebSocket and then flush all the calls remained at client. 
 
 
-##Usage
-### Define JSSO
+## Usage
+### Define Server-Side JSSO Contents
 A JSSO should be like this:
 ```JavaScript
 {
@@ -36,7 +36,6 @@ A JSSO should be like this:
 ```
 and saving it with a unique ID/name - just like saving all files under the same folder.
 You may have your JSSOs as many as you like, and naming them whatever you want.
-
 
 Writing JSSO is really easy. For example, naming the following object with ID "my.test":
 ```JavaScript
@@ -61,7 +60,7 @@ Instead of using JSON-like style, you can, but not recommend, contruct JSSO in a
 notice that it is a anonymous function call, but not a function declaration.
 
 
-### Use JSSO
+### Get JSSO Stub
 Please includes "JSSO.js" in HTML5 before use. It is placed at "/www/JSSO.js" of the repository: 
 ```HTML
 <script src="JSSO.js"></script>
@@ -76,6 +75,7 @@ In the background, JSSO.js would try building a WebSocket connection to the serv
 ![alt text](https://raw.github.com/dogdoglization/node-jsso-server/master/readme_resource/how_to_get_stub.png "How to get a JSSO stub")
 
 
+### Use Stub API
 #### Invoke Function
 ##### .invoke(functionName :string[, parameter :object], onSuccess :function[, onError :function])
 To make invocation, you need specifing at least the function name and a callback for receiving the returned data.
@@ -145,13 +145,13 @@ jsso.invoke("hello", [["your", "array", "elements"]],
 
 
 #### Broadcast Message
-##### .broadcast(massageName :string, massage :object[, onError :function])
+##### .broadcast(massageName :string, massage :object)
 You can also broadcast messages using similar approach:
 ```JavaScript
 jsso.broadcast("notice", "It's a test!");
 ```
 The above script attempts broadcasting the message "It's a test!" with the name "notice" through my.test JSSO.
-##### .broadcast(functionName :string, massage:object)
+##### .broadcast(functionName :string, massage:object[, onError :function])
 In addition, you can process the message in JSSO before broadcasting, in which the name of the handler function should be the same as messages' name.
 For example, we can reuse the function of my.test as the handler like this:
 ```JavaScript
