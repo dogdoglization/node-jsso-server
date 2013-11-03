@@ -77,11 +77,12 @@ In the background, JSSO.js would try building a WebSocket connection to the serv
 
 
 #### Invoke Function
+##### .invoke(functionName :string[, parameter :object], onSuccess :function[, onError :function])
 To make invocation, you need specifing at least the function name and a callback for receiving the returned data.
 Callback function is required because it is internally a non-blocking asynchronous call:
 ![alt text](https://raw.github.com/dogdoglization/node-jsso-server/master/readme_resource/how_to_invoke.png "How to invoke function")
 However, parameters and error handler are optional for the call.
-##### .invoke(functionName:string, parameter:Object, callback:function)
+
 we now can make the function call and handle the data returned using a callback:
 ```JavaScript
 //pass the parameter as the 2nd argument
@@ -93,7 +94,7 @@ jsso.invoke("hello", "World", function(data) {
 //jsso.hello("World");
 ```
 The above is a syntax sugar: directly pass the parameter only if there is one argument for the function.
-##### .invoke(functionName:string, parameters:Array, callback:function)
+
 Formally, parameters should wrap in an array like this:
 ```JavaScript
 jsso.invoke("hello", ["World", "Web", "others"], function(data) {
@@ -113,14 +114,14 @@ jsso.invoke("hello", [["your", "array", "elements"]], function(data) {
 //the server function call would be like this:
 //jsso.hello(["your", "array", "elements"]);
 ```
-##### .invoke(functionName:string, callback:function)
+
 If no parameter is required, simply skip it and pass the callback as the 2nd parameter:
 ```JavaScript
 jsso.invoke("hello", function(data) {
 	alert(data);
 });
 ```
-##### .invoke(functionName:string[, parameter:Object], onSuccess:function[, onError:function])
+
 Any errors found during invoking will be extracted by JSSO server and rebuilt at JSSO.js seamlessly. 
 You can append a optional error handler in the call:
 ```JavaScript
@@ -144,22 +145,13 @@ jsso.invoke("hello", [["your", "array", "elements"]],
 
 
 #### Broadcast Message
+##### .broadcast(massageName :string, massage :object[, onError :function])
 You can also broadcast messages using similar approach:
 ```JavaScript
 jsso.broadcast("notice", "It's a test!");
 ```
 The above script attempts broadcasting the message "It's a test!" with the name "notice" through my.test JSSO.
-On the other hand, to listen these messages at other app instances you should:
-```JavaScript
-var jsso = new JSSO("my.test"); //get a new stub of the same JSSO first
-jsso.on("notice", function(data) { //listen messages with the the name "notice"
-	alert(data);
-});
-```
-You can unregister listener anytime by calling off() function:
-```JavaScript
-jsso.off("notice"); //unlisten to messages with the name "notice"
-```
+##### .broadcast(functionName :string, massage:object)
 In addition, you can process the message in JSSO before broadcasting, in which the name of the handler function should be the same as messages' name.
 For example, we can reuse the function of my.test as the handler like this:
 ```JavaScript
@@ -171,12 +163,26 @@ jsso.on("hello", function(data) {
 	alert(data); //get "hello user, this is broadcast message!"
 });
 ```
-![alt text](https://raw.github.com/dogdoglization/node-jsso-server/master/readme_resource/how_to_broadcast.png "How to broadcast message")
-Optionally, you can handle any error occurred during message proccessing, in which a error handler is required:
+Optionally, you can handle any error found in server-side handler during message proccessing, by adding a error handler as last parameter:
 ```JavaScript
 jsso.broadcast("hello", "something", function(error) {//error handler, optional
 	//handle error here
 });
+```
+![alt text](https://raw.github.com/dogdoglization/node-jsso-server/master/readme_resource/how_to_broadcast.png "How to broadcast message")
+
+##### .on(massageName :string, listener :function)
+As you see in previous code snippet, to get these messages at other app instances you should register a function to listen the event:
+```JavaScript
+var jsso = new JSSO("my.test"); //get a new stub of the same JSSO first
+jsso.on("notice", function(data) { //listen messages with the the name "notice"
+	alert(data);
+});
+```
+##### .off(massageName :string)
+Unregister listener is really really easy:
+```JavaScript
+jsso.off("notice"); //unlisten to messages with the name "notice"
 ```
 
 
