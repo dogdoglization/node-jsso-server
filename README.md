@@ -1,5 +1,9 @@
 # node-jsso-server
 
+###deprecated
+**This project is no longer maintained.**
+
+## Description
 node-jsso-server is aimed for providing a easy approach of app server/client programming, running upon node.js. 
 It treats each of different groups of server functions as a JavaScript object and represent it as a object-like stub in your HTML5 script.
 
